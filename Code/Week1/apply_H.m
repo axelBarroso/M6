@@ -4,7 +4,6 @@ function [ outI ] = apply_H(I, H)
 
 sizeI = size(I);
 sizeH = size(H);
-outI = zeros(sizeI(1),sizeI(2),sizeI(3));
 [nrows, ncols, nchan] = size(I);
 
 % Check dimensions 
@@ -50,6 +49,7 @@ HZ = reshape(HiXYZs(3,:), Hnrows, Hncols);
 HX = HX ./ HZ;
 HY = HY ./ HZ;
 
+outI = zeros(Hnrows,Hncols, nchan);
 for c=1:nchan,
     outI(:,:,c) = interp2(double(I(:,:,c)), HX, HY, 'linear', 0);
 end
