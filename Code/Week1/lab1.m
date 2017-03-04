@@ -15,6 +15,12 @@
 I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces a similarity transformation
+angle = 15
+theta = degtorad(angle);
+scale_factor = 0.5;
+translation = [100 100];
+H = [scale_factor*cos(theta) -scale_factor*sin(theta) translation(1); scale_factor*sin(theta)  scale_factor*cos(theta) translation(2) ; 0 0 1];
+
 
 I2 = apply_H(I, H);
 figure; imshow(I); figure; imshow(uint8(I2));
@@ -29,6 +35,7 @@ figure; imshow(I); figure; imshow(uint8(I2));
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
+
 
 % ToDo: verify that the product of the four previous transformations
 % produces the same matrix H as above
