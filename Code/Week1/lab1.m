@@ -37,8 +37,7 @@ figure; imshow(I); figure; imshow(uint8(I2));
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
-[U,S,V] = svd(H(1:size(H,1)-1,1:size(H,2)-1)) 
-%performs a singular value decomposition of matrix A, such that A = U*S*V'.
+[U,S,V] = svd(H(1:size(H,1)-1,1:size(H,2)-1)) %performs a singular value decomposition of matrix A, such that A = U*S*V'.
 l = [0,0,1];
 padding = [0,0]';
 rotation_1 = [U*V' padding; l];
