@@ -12,14 +12,37 @@
 
 
 %% 1.1. Similarities
-I=imread('Data/0005_s.png'); % we have to be in the proper folder
+I=imread('Data/0000_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces a similarity transformation
-angle = 15;
-theta = degtorad(angle);
-scale_factor = 0.5;
-translation = [100 75];
-H = [scale_factor*cos(theta) -scale_factor*sin(theta) translation(1); scale_factor*sin(theta)  scale_factor*cos(theta) translation(2) ; 0 0 1];
+% Matrix H with translation
+H = [1 0 100; 
+     0 1 150;
+     0 0 1];
+
+I2 = apply_H(I, H);
+figure; imshow(I); figure; imshow(uint8(I2));
+
+% Matrix H with rotation of 20º
+H = [cosd(20) -sind(20) 0; 
+     sind(20) cosd(20) 0;
+     0 0 1];
+
+I2 = apply_H(I, H);
+figure; imshow(I); figure; imshow(uint8(I2));
+
+% Matrix H with translation & rotation
+H = [cosd(20) -sind(20) 100; 
+     sind(20) cosd(20) 150;
+     0 0 1];
+
+I2 = apply_H(I, H);
+figure; imshow(I); figure; imshow(uint8(I2));
+
+% Matrix H with scale
+H = [2 0 0; 
+     0 2 0;
+     0 0 1];
 
 I2 = apply_H(I, H);
 figure; imshow(I); figure; imshow(uint8(I2));
@@ -28,16 +51,16 @@ figure; imshow(I); figure; imshow(uint8(I2));
 %% 1.2. Affinities
 
 % ToDo: generate a matrix H which produces an affine transformation
-% Compute H a <- p. It maps an ideal point (x1,x2,0)^T to a finite point
-% (x1,x2,v1x1+v2x2)^T
+H = [1.15 -0.3 160; 
+     0.3 0.65 -65;
+     0 0 1];
 
 I2 = apply_H(I, H);
 figure; imshow(I); figure; imshow(uint8(I2));
 
-
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
-[U,S,V] = svd(H(1:size(H,1)-1,1:size(H,2)-1)) %performs a singular value decomposition of matrix A, such that A = U*S*V'.
+[U,S,V] = svd(H(1:size(H,1)-1,1:size(H,2)-1)); %performs a singular value decomposition of matrix A, such that A = U*S*V'.
 l = [0,0,1];
 padding = [0,0]';
 rotation_1 = [U*V' padding; l];
@@ -150,5 +173,3 @@ plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
 %% 7. OPTIONAL: Affine Rectification of the left facade of image 0001
 
 %% 8. OPTIONAL: Metric Rectification of the left facade of image 0001
-
-
