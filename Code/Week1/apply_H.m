@@ -7,7 +7,7 @@ sizeH = size(H);
 outI = zeros(sizeI(1),sizeI(2),sizeI(3));
 [nrows, ncols, nchan] = size(I);
 
-% Check dimensions
+% Check dimensions 
 if ((sizeH(1) ~= 3) || (sizeH(2) ~= 3))
     display('Matrix H has incorrect dimensions')
     return
