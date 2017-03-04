@@ -118,6 +118,15 @@ p6 = [A(i,3) A(i,4) 1]';
 i = 565;
 p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
+i = 227;
+p9 = [A(i,1) A(i,2) 1]';
+p10 = [A(i,3) A(i,4) 1]';
+i = 576;
+p11 = [A(i,1) A(i,2) 1]';
+p12 = [A(i,3) A(i,4) 1]';
+i = 534;
+p13 = [A(i,1) A(i,2) 1]';
+p14 = [A(i,3) A(i,4) 1]';
 
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
 l1 = computeLine( p1, p2);
@@ -150,19 +159,27 @@ I_ap = apply_H(I, H_ap);
 figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-new_p1 = computeTransformedPoints(H_ap, p1);
-new_p2 = computeTransformedPoints(H_ap, p2);
-new_p3 = computeTransformedPoints(H_ap, p3);
-new_p4 = computeTransformedPoints(H_ap, p4);
-new_p5 = computeTransformedPoints(H_ap, p5);
-new_p6 = computeTransformedPoints(H_ap, p6);
-new_p7 = computeTransformedPoints(H_ap, p7);
-new_p8 = computeTransformedPoints(H_ap, p8);
+new_p1  = computeTransformedPoints(H_ap, p1);
+new_p2  = computeTransformedPoints(H_ap, p2);
+new_p3  = computeTransformedPoints(H_ap, p3);
+new_p4  = computeTransformedPoints(H_ap, p4);
+new_p5  = computeTransformedPoints(H_ap, p5);
+new_p6  = computeTransformedPoints(H_ap, p6);
+new_p7  = computeTransformedPoints(H_ap, p7);
+new_p8  = computeTransformedPoints(H_ap, p8);
+new_p9  = computeTransformedPoints(H_ap, p9);
+new_p10 = computeTransformedPoints(H_ap, p10);
+new_p11 = computeTransformedPoints(H_ap, p11);
+new_p12 = computeTransformedPoints(H_ap, p12);
+new_p13 = computeTransformedPoints(H_ap, p13);
+new_p14 = computeTransformedPoints(H_ap, p14);
 
 lr1 = computeLine( new_p1, new_p2);
 lr2 = computeLine( new_p3, new_p4);
 lr3 = computeLine( new_p5, new_p6);
 lr4 = computeLine( new_p7, new_p8);
+lr5 = computeLine( new_p9, new_p12);
+lr6 = computeLine( new_p10, new_p13);
 
 % show the transformed lines in the transformed image
 figure(12);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
@@ -224,23 +241,34 @@ disp(' ');
 %       the metric rectification) with the chosen lines printed on it.
 %       Compute also the angles between the pair of lines before and after
 %       rectification.
+lr5 = computeLine( new_p9, new_p12);
+lr6 = computeLine( new_p10, new_p13);
+lr7 = computeLine( new_p2, new_p5);
+lr8 = computeLine( new_p1, new_p8);
 
-l5 = computeLine( new_p2, new_p5);
-l5 = l5 / l5(3);
-l6 = computeLine( new_p1, new_p8);
-l6 = l6 / l6(3);
+% normalize orthogonal lines so that they have 2 elements
+lr5 = lr5 / lr5(3);
+lr6 = lr6 / lr6(3);
+lr7 = lr7 / lr7(3);
+lr8 = lr8 / lr8(3);
+
 figure(10);imshow(uint8(I_ap));
 hold on;
 t=1:0.1:1000;
-plot(t, -(l5(1)*t + l5(3)) / l5(2), 'y');
-plot(t, -(l6(1)*t + l6(3)) / l6(2), 'y');
+plot(t, -(lr5(1)*t + lr5(3)) / lr5(2), 'y');
+plot(t, -(lr6(1)*t + lr6(3)) / lr6(2), 'y');
+plot(t, -(lr7(1)*t + lr7(3)) / lr7(2), 'y');
+plot(t, -(lr8(1)*t + lr8(3)) / lr8(2), 'y');
 
-s = -1*[l5(1)*l6(1), l5(1)*l6(2) + l5(2)*l6(1), l5(2)*l6(2)];
-S = [s(1) s(2);s(2) s(3)]
+n = [lr5(1)*lr6(1), lr5(1)*lr6(2) + lr5(2)*lr6(1), lr5(2)*lr6(2) ; ...
+     lr7(1)*lr8(1), lr7(1)*lr8(2) + lr7(2)*lr8(1), lr7(2)*lr8(2)];
+s = null(n);
+S = [s(1) s(2);s(2) s(3)];
 % Cholesky decomposition
 K = chol(S,'upper');
 
 H_sa = [K [0; 0]; 0 0 1];
+H_sa = inv(H_sa);
 I2 = apply_H(I_ap, H_sa);
 figure(13); imshow(uint8(I2)); title('Metric rectification via orthogonal lines.')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
