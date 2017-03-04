@@ -15,7 +15,7 @@
 I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces a similarity transformation
-angle = 15
+angle = 15;
 theta = degtorad(angle);
 scale_factor = 0.5;
 translation = [100 75];
@@ -57,10 +57,14 @@ I2 = apply_H(I, H_new);
 figure; imshow(uint8(I2));
 
 
-
 % ToDo: verify that the proper sequence of the four previous
 % transformations over the image I produces the same image I2 as before
-
+I_aux = apply_H(I, rotation_2);
+I_aux = apply_H(I_aux, scaling);
+I_aux = apply_H(I_aux, rotation_2');
+I_aux = apply_H(I_aux, rotation_1);
+I_aux = apply_H(I_aux, translation);
+figure; imshow(uint8(I_aux));
 
 
 %% 1.3 Projective transformations (homographies)
