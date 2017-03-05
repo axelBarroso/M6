@@ -240,7 +240,7 @@ lr3 = lr3 / lr3(3);
 lr5 = lr5 / lr5(3);
 lr6 = lr6 / lr6(3);
 
-figure(13);imshow(uint8(I_ap));
+figure(13);imshow(uint8(I_ap)); title('Before metric rectification.')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
