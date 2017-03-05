@@ -10,7 +10,9 @@
 % At some point you will need to interpolate the image values at some points,
 % you may use the Matlab function "interp2" for that.
 
-
+clear all;
+close all;
+clc;
 %% 1.1. Similarities
 I=imread('Data/0000_s.png'); % we have to be in the proper folder
 figure(1); imshow(I); title('Original Image');
@@ -302,6 +304,91 @@ disp(' ');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Metric Rectification in a single step
 % Use 5 pairs of orthogonal lines (pages 55-57, Hartley-Zisserman book)
+
+% choose the image points
+I = imread('Data/0000_s.png');
+A = load('Data/0000_s_info_lines.txt');
+
+% indices of lines
+i = 424;
+p1 = [A(i,1) A(i,2) 1]';
+p2 = [A(i,3) A(i,4) 1]';
+i = 240;
+p3 = [A(i,1) A(i,2) 1]';
+p4 = [A(i,3) A(i,4) 1]';
+i = 712;
+p5 = [A(i,1) A(i,2) 1]';
+p6 = [A(i,3) A(i,4) 1]';
+i = 565;
+p7 = [A(i,1) A(i,2) 1]';
+p8 = [A(i,3) A(i,4) 1]';
+i = 227;
+p9 = [A(i,1) A(i,2) 1]';
+p10 = [A(i,3) A(i,4) 1]';
+i = 576;
+p11 = [A(i,1) A(i,2) 1]';
+p12 = [A(i,3) A(i,4) 1]';
+i = 534;
+p13 = [A(i,1) A(i,2) 1]';
+p14 = [A(i,3) A(i,4) 1]';
+
+% Construct 5 pairs of orthogonal lines
+l1  = computeLine( p1  , p2);
+l2  = computeLine( p5  , p6);
+
+l3  = computeLine( p3  , p4);
+l4  = computeLine( p7  , p8);
+
+l5  = computeLine( p9  , p12);
+l6  = computeLine( p10 , p13);
+
+l7  = computeLine( p9  , p10);
+l8  = computeLine( p13 , p14);
+
+l9  = computeLine( p2  , p5);
+l10 = computeLine( p1  , p8);
+
+% normalize lines
+l1  = l1 / l1(3);
+l2  = l2 / l2(3);
+l3  = l3 / l3(3);
+l4  = l4 / l4(3);
+l5  = l5 / l5(3);
+l6  = l6 / l6(3);
+l7  = l7 / l7(3);
+l8  = l8 / l8(3);
+l9  = l9 / l9(3);
+l10 = l10 / l10(3);
+
+% show the chosen lines in the image
+figure(16);imshow(I);
+hold on;
+t=1:0.1:1000; title('Pairs of orthogonal lines.')
+plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
+plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
+plot(t, -(l3(1)*t + l3(3)) / l3(2), 'r');
+plot(t, -(l4(1)*t + l4(3)) / l4(2), 'r');
+plot(t, -(l5(1)*t + l5(3)) / l5(2), 'm');
+plot(t, -(l6(1)*t + l6(3)) / l6(2), 'm');
+plot(t, -(l7(1)*t + l7(3)) / l7(2), 'g');
+plot(t, -(l8(1)*t + l8(3)) / l8(2), 'g');
+plot(t, -(l9(1)*t + l9(3)) / l9(2), 'b');
+plot(t, -(l10(1)*t + l10(3)) / l10(2), 'b');
+
+% Find conic coefficient matrix C*
+c = [l1(1)*l2(1) , (l1(1)*l2(2)  + l1(2)*l2(1))/2 , l1(2)*l2(2) , (l1(1)+l2(1))/2 , (l1(2)+l2(2))/2 , 1; ...
+     l3(1)*l4(1) , (l3(1)*l4(2)  + l3(2)*l4(1))/2 , l3(2)*l4(2) , (l3(1)+l4(1))/2 , (l3(2)+l4(2))/2 , 1; ...
+     l5(1)*l6(1) , (l5(1)*l6(2)  + l5(2)*l6(1))/2 , l5(2)*l6(2) , (l5(1)+l6(1))/2 , (l5(2)+l6(2))/2 , 1; ...
+     l7(1)*l8(1) , (l7(1)*l8(2)  + l7(2)*l8(1))/2 , l7(2)*l8(2) , (l7(1)+l8(1))/2 , (l7(2)+l8(2))/2 , 1; ...
+     l9(1)*l10(1), (l9(1)*l10(2) + l9(2)*l10(1))/2, l9(2)*l10(2), (l9(1)+l10(1))/2, (l9(2)+l10(2))/2, 1];
+     
+c = null(c);
+% Get C* from c coefficients
+Cmatrix = [c(1) c(2)/2 c(4)/2 ; c(2)/2 c(3) c(5)/2; c(4)/2 c(5)/2 c(6)];
+
+
+I_out =I;
+figure(17); imshow(uint8(I_out)); title('Direct metric rectification via orthogonal lines.')
 
 %% 5. OPTIONAL: Affine Rectification of the left facade of image 0000
 
