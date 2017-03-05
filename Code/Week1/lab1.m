@@ -159,27 +159,15 @@ I_ap = apply_H(I, H_ap);
 figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-new_p1  = computeTransformedPoints(H_ap, p1);
-new_p2  = computeTransformedPoints(H_ap, p2);
-new_p3  = computeTransformedPoints(H_ap, p3);
-new_p4  = computeTransformedPoints(H_ap, p4);
-new_p5  = computeTransformedPoints(H_ap, p5);
-new_p6  = computeTransformedPoints(H_ap, p6);
-new_p7  = computeTransformedPoints(H_ap, p7);
-new_p8  = computeTransformedPoints(H_ap, p8);
-new_p9  = computeTransformedPoints(H_ap, p9);
-new_p10 = computeTransformedPoints(H_ap, p10);
-new_p11 = computeTransformedPoints(H_ap, p11);
-new_p12 = computeTransformedPoints(H_ap, p12);
-new_p13 = computeTransformedPoints(H_ap, p13);
-new_p14 = computeTransformedPoints(H_ap, p14);
+points = [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14];
+newPoints  = apply_H_toPoints( H_ap, points );
 
-lr1 = computeLine( new_p1, new_p2);
-lr2 = computeLine( new_p3, new_p4);
-lr3 = computeLine( new_p5, new_p6);
-lr4 = computeLine( new_p7, new_p8);
-lr5 = computeLine( new_p9, new_p12);
-lr6 = computeLine( new_p10, new_p13);
+lr1 = computeLine( newPoints(:,1),  newPoints(:,2));
+lr2 = computeLine( newPoints(:,3),  newPoints(:,4));
+lr3 = computeLine( newPoints(:,5),  newPoints(:,6));
+lr4 = computeLine( newPoints(:,7),  newPoints(:,8));
+lr5 = computeLine( newPoints(:,9),  newPoints(:,12));
+lr6 = computeLine( newPoints(:,10), newPoints(:,13));
 
 % show the transformed lines in the transformed image
 figure(12);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
@@ -216,20 +204,20 @@ angler23 = acosd(dot(normlr2,normlr3)/(norm(normlr2)*norm(normlr3)));
 angle24= acosd(dot(norml2,norml4)/(norm(norml2)*norm(norml4)));
 angler24 = acosd(dot(normlr2,normlr4)/(norm(normlr2)*norm(normlr4)));
 
-disp(['Upper left corner before transformation: ' , num2str(angle13)]);
-disp(['Upper left corner after transformation: ' , num2str(angler13)]);
+disp(['Upper left corner before transformation: ' , num2str(angle13), 'º']);
+disp(['Upper left corner after transformation: ' , num2str(angler13), 'º']);
 disp(' ');
 
-disp(['Upper right corner before transformation: ' , num2str(angle14)]);
-disp(['Upper right corner after transformation: ' , num2str(angler14)]);
+disp(['Upper right corner before transformation: ' , num2str(angle14), 'º']);
+disp(['Upper right corner after transformation: ' , num2str(angler14), 'º']);
 disp(' ');
 
-disp(['Lower left corner before transformation: ' , num2str(angle23)]);
-disp(['Lower left corner after transformation: ' , num2str(angler23)]);
+disp(['Lower left corner before transformation: ' , num2str(angle23), 'º']);
+disp(['Lower left corner after transformation: ' , num2str(angler23), 'º']);
 disp(' ');
 
-disp(['Lower right corner before transformation: ' , num2str(angle24)]);
-disp(['Lower right corner after transformation: ' , num2str(angler24)]);
+disp(['Lower right corner before transformation: ' , num2str(angle24), 'º']);
+disp(['Lower right corner after transformation: ' , num2str(angler24), 'º']);
 disp(' ');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Metric Rectification
@@ -241,27 +229,28 @@ disp(' ');
 %       the metric rectification) with the chosen lines printed on it.
 %       Compute also the angles between the pair of lines before and after
 %       rectification.
-lr5 = computeLine( new_p9, new_p12);
-lr6 = computeLine( new_p10, new_p13);
-lr7 = computeLine( new_p2, new_p5);
-lr8 = computeLine( new_p1, new_p8);
+lr1 = computeLine( newPoints(:,1),  newPoints(:,2));
+lr3 = computeLine( newPoints(:,5),  newPoints(:,6));
+lr5 = computeLine( newPoints(:,9) , newPoints(:,12));
+lr6 = computeLine( newPoints(:,10), newPoints(:,13));
 
 % normalize orthogonal lines so that they have 2 elements
+lr1 = lr1 / lr1(3);
+lr3 = lr3 / lr3(3);
 lr5 = lr5 / lr5(3);
 lr6 = lr6 / lr6(3);
-lr7 = lr7 / lr7(3);
-lr8 = lr8 / lr8(3);
 
-figure(10);imshow(uint8(I_ap));
+figure(13);imshow(uint8(I_ap));
 hold on;
 t=1:0.1:1000;
-plot(t, -(lr5(1)*t + lr5(3)) / lr5(2), 'y');
-plot(t, -(lr6(1)*t + lr6(3)) / lr6(2), 'y');
-plot(t, -(lr7(1)*t + lr7(3)) / lr7(2), 'y');
-plot(t, -(lr8(1)*t + lr8(3)) / lr8(2), 'y');
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr5(1)*t + lr5(3)) / lr5(2), 'r');
+plot(t, -(lr6(1)*t + lr6(3)) / lr6(2), 'r');
 
 n = [lr5(1)*lr6(1), lr5(1)*lr6(2) + lr5(2)*lr6(1), lr5(2)*lr6(2) ; ...
-     lr7(1)*lr8(1), lr7(1)*lr8(2) + lr7(2)*lr8(1), lr7(2)*lr8(2)];
+     lr1(1)*lr3(1), lr1(1)*lr3(2) + lr1(2)*lr3(1), lr1(2)*lr3(2)];
+ 
 s = null(n);
 S = [s(1) s(2);s(2) s(3)];
 % Cholesky decomposition
@@ -269,8 +258,47 @@ K = chol(S,'upper');
 
 H_sa = [K [0; 0]; 0 0 1];
 H_sa = inv(H_sa);
-I2 = apply_H(I_ap, H_sa);
-figure(13); imshow(uint8(I2)); title('Metric rectification via orthogonal lines.')
+I_sa = apply_H(I_ap, H_sa);
+figure(14); imshow(uint8(I_sa)); title('Metric rectification via orthogonal lines.')
+
+% Compute image with lines
+newPoints_sa  = apply_H_toPoints( H_sa, newPoints );
+
+lrr1 = computeLine( newPoints_sa(:,1),  newPoints_sa(:,2));
+lrr3 = computeLine( newPoints_sa(:,5),  newPoints_sa(:,6));
+lrr5 = computeLine( newPoints_sa(:,9) , newPoints_sa(:,12));
+lrr6 = computeLine( newPoints_sa(:,10), newPoints_sa(:,13));
+
+% normalize orthogonal lines so that they have 2 elements
+lrr1 = lrr1 / lrr1(3);
+lrr3 = lrr3 / lrr3(3);
+lrr5 = lrr5 / lrr5(3);
+lrr6 = lrr6 / lrr6(3);
+
+% show the transformed lines in the transformed image
+figure(15);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
+hold on;
+t=1:0.1:1000;
+plot(t, -(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
+plot(t, -(lrr3(1)*t + lrr3(3)) / lrr3(2), 'y');
+plot(t, -(lrr5(1)*t + lrr5(3)) / lrr5(2), 'r');
+plot(t, -(lrr6(1)*t + lrr6(3)) / lrr6(2), 'r');
+
+% ToDo: to evaluate the results, compute the angle between the different pair 
+% of lines before and after the image transformation
+angle13 = acosd(dot(lr1,lr3)/(norm(lr1)*norm(lr3)));
+angler13 = acosd(dot(lrr1,lrr3)/(norm(lrr1)*norm(lrr3)));
+
+angle56 = acosd(dot(lr5,lr6)/(norm(lr5)*norm(lr6)));
+angler56 = acosd(dot(lrr5,lrr6)/(norm(lrr5)*norm(lrr6)));
+
+disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'º']);
+disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'º']);
+disp(' ');
+
+disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'º']);
+disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'º']);
+disp(' ');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Metric Rectification in a single step
 % Use 5 pairs of orthogonal lines (pages 55-57, Hartley-Zisserman book)
