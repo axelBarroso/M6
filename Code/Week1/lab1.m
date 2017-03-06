@@ -26,7 +26,7 @@ H = [1 0 100;
 I2 = apply_H(I, H, 'keepOriginalPositions');
 figure(2); imshow(uint8(I2)); title('Planar transformations: Translation');
 
-% Matrix H with rotation of 20�
+% Matrix H with rotation of 20º
 H = [cosd(20) -sind(20) 0; 
      sind(20) cosd(20) 0;
      0 0 1];
@@ -207,20 +207,20 @@ angler23 = acosd(dot(normlr2,normlr3)/(norm(normlr2)*norm(normlr3)));
 angle24= acosd(dot(norml2,norml4)/(norm(norml2)*norm(norml4)));
 angler24 = acosd(dot(normlr2,normlr4)/(norm(normlr2)*norm(normlr4)));
 
-disp(['Upper left corner before transformation: ' , num2str(angle13), '�']);
-disp(['Upper left corner after transformation: ' , num2str(angler13), '�']);
+disp(['Upper left corner before transformation: ' , num2str(angle13), 'º']);
+disp(['Upper left corner after transformation: ' , num2str(angler13), 'º']);
 disp(' ');
 
-disp(['Upper right corner before transformation: ' , num2str(angle14), '�']);
-disp(['Upper right corner after transformation: ' , num2str(angler14), '�']);
+disp(['Upper right corner before transformation: ' , num2str(angle14), 'º']);
+disp(['Upper right corner after transformation: ' , num2str(angler14), 'º']);
 disp(' ');
 
-disp(['Lower left corner before transformation: ' , num2str(angle23), '�']);
-disp(['Lower left corner after transformation: ' , num2str(angler23), '�']);
+disp(['Lower left corner before transformation: ' , num2str(angle23), 'º']);
+disp(['Lower left corner after transformation: ' , num2str(angler23), 'º']);
 disp(' ');
 
-disp(['Lower right corner before transformation: ' , num2str(angle24), '�']);
-disp(['Lower right corner after transformation: ' , num2str(angler24), '�']);
+disp(['Lower right corner before transformation: ' , num2str(angle24), 'º']);
+disp(['Lower right corner after transformation: ' , num2str(angler24), 'º']);
 disp(' ');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Metric Rectification
@@ -306,12 +306,12 @@ angler13 = acosd(dot(normlrr1,normlrr3)/(norm(normlrr1)*norm(normlrr3)));
 angle56 = acosd(dot(normlr5,normlr6)/(norm(normlr5)*norm(normlr6)));
 angler56 = acosd(dot(normlrr5,normlrr6)/(norm(normlrr5)*norm(normlrr6)));
 
-disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), '�']);
-disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), '�']);
+disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'º']);
+disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'º']);
 disp(' ');
 
-disp(['Crossing point red lines before transformation: ' , num2str(angle56), '�']);
-disp(['Crossing point red lines after transformation: ' , num2str(angler56), '�']);
+disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'º']);
+disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'º']);
 disp(' ');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Metric Rectification in a single step
@@ -403,9 +403,219 @@ I_out =I;
 figure(17); imshow(uint8(I_out)); title('Direct metric rectification via orthogonal lines.')
 
 %% 5. OPTIONAL: Affine Rectification of the left facade of image 0000
+I = imread('Data/0000_s.png');
+A = load('Data/0000_s_info_lines.txt');
+
+% indices of lines
+i = 493;
+p1 = [A(i,1) A(i,2) 1]';
+p2 = [A(i,3) A(i,4) 1]';
+i = 186;
+p3 = [A(i,1) A(i,2) 1]';
+p4 = [A(i,3) A(i,4) 1]';
+i = 48;
+p5 = [A(i,1) A(i,2) 1]';
+p6 = [A(i,3) A(i,4) 1]';
+i = 508;
+p7 = [A(i,1) A(i,2) 1]';
+p8 = [A(i,3) A(i,4) 1]';
+
+% compute the lines l1, l2, l3, l4, that pass through the different pairs of points
+l1 = computeLine( p1, p2);
+l2 = computeLine( p3, p4);
+l3 = computeLine( p5, p6);
+l4 = computeLine( p7, p8);
+
+% show the chosen lines in the image
+
+figure(10);imshow(I);
+hold on;
+t=1:0.1:1000;
+plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
+plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
+plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
+plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
+
+
+% ToDo: compute the homography that affinely rectifies the image
+% Compute vanishing points
+vp_12 = cross(l1, l2);
+vp_12 = vp_12 / vp_12(3);
+vp_34 = cross(l3, l4);
+vp_34 = vp_34 / vp_34(3);
+l_inf = cross(vp_12,vp_34);
+l_inf = l_inf / l_inf(3);
+
+H_ap = [1 0 0; 0 1 0; l_inf];
+I_ap = apply_H(I, H_ap, 'keepOriginalPositions');
+figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
+
+% ToDo: compute the transformed lines lr1, lr2, lr3, lr4
+points = [p1 p2 p3 p4 p5 p6 p7 p8];
+newPoints  = apply_H_toPoints( H_ap, points );
+
+lr1 = computeLine( newPoints(:,1),  newPoints(:,2));
+lr2 = computeLine( newPoints(:,3),  newPoints(:,4));
+lr3 = computeLine( newPoints(:,5),  newPoints(:,6));
+lr4 = computeLine( newPoints(:,7),  newPoints(:,8));
+
+% show the transformed lines in the transformed image
+figure(12);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
+hold on;
+t=1:0.1:1000;
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'y');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
+
+% to evaluate the results, compute the angle between the different pair 
+% of lines before and after the image transformation
+
+norml1 = [l1(1)/l1(3), l1(2)/l1(3)];
+norml2 = [l2(1)/l2(3), l2(2)/l2(3)];
+norml3 = [l3(1)/l1(3), l3(2)/l3(3)];
+norml4 = [l4(1)/l4(3), l4(2)/l4(3)];
+
+normlr1 = [lr1(1)/lr1(3), lr1(2)/lr1(3)];
+normlr2 = [lr2(1)/lr2(3), lr2(2)/lr2(3)];
+normlr3 = [lr3(1)/lr1(3), lr3(2)/lr3(3)];
+normlr4 = [lr4(1)/lr4(3), lr4(2)/lr4(3)];
+
+angle13 = acosd(dot(norml1,norml3)/(norm(norml1)*norm(norml3)));
+angler13 = acosd(dot(normlr1,normlr3)/(norm(normlr1)*norm(normlr3)));
+
+angle14 = acosd(dot(norml1,norml4)/(norm(norml1)*norm(norml4)));
+angler14 = acosd(dot(normlr1,normlr4)/(norm(normlr1)*norm(normlr4)));
+
+angle23 = acosd(dot(norml2,norml3)/(norm(norml2)*norm(norml3)));
+angler23 = acosd(dot(normlr2,normlr3)/(norm(normlr2)*norm(normlr3)));
+
+angle24 = acosd(dot(norml2,norml4)/(norm(norml2)*norm(norml4)));
+angler24 = acosd(dot(normlr2,normlr4)/(norm(normlr2)*norm(normlr4)));
+
+disp(['Upper left corner before transformation: ' , num2str(angle13), 'º']);
+disp(['Upper left corner after transformation: ' , num2str(angler13), 'º']);
+disp(' ');
+
+disp(['Upper right corner before transformation: ' , num2str(angle14), 'º']);
+disp(['Upper right corner after transformation: ' , num2str(angler14), 'º']);
+disp(' ');
+
+disp(['Lower left corner before transformation: ' , num2str(angle23), 'º']);
+disp(['Lower left corner after transformation: ' , num2str(angler23), 'º']);
+disp(' ');
+
+disp(['Lower right corner before transformation: ' , num2str(angle24), 'º']);
+disp(['Lower right corner after transformation: ' , num2str(angler24), 'º']);
+disp(' ');
+
 
 %% 6. OPTIONAL: Metric Rectification of the left facade of image 0000
 
 %% 7. OPTIONAL: Affine Rectification of the left facade of image 0001
+I = imread('Data/0001_s.png');
+A = load('Data/0001_s_info_lines.txt');
+
+% indices of lines
+i = 614;
+p1 = [A(i,1) A(i,2) 1]';
+p2 = [A(i,3) A(i,4) 1]';
+i = 159;
+p3 = [A(i,1) A(i,2) 1]';
+p4 = [A(i,3) A(i,4) 1]';
+i = 645;
+p5 = [A(i,1) A(i,2) 1]';
+p6 = [A(i,3) A(i,4) 1]';
+i = 541;
+p7 = [A(i,1) A(i,2) 1]';
+p8 = [A(i,3) A(i,4) 1]';
+
+% compute the lines l1, l2, l3, l4, that pass through the different pairs of points
+l1 = computeLine( p1, p2);
+l2 = computeLine( p3, p4);
+l3 = computeLine( p5, p6);
+l4 = computeLine( p7, p8);
+
+% show the chosen lines in the image
+
+figure(10);imshow(I);
+hold on;
+t=1:0.1:1000;
+plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
+plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
+plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
+plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
+
+% ToDo: compute the homography that affinely rectifies the image
+% Compute vanishing points
+vp_12 = cross(l1, l2);
+vp_12 = vp_12 / vp_12(3);
+vp_34 = cross(l3, l4);
+vp_34 = vp_34 / vp_34(3);
+l_inf = cross(vp_12,vp_34);
+l_inf = l_inf / l_inf(3);
+
+H_ap = [1 0 0; 0 1 0; l_inf];
+I_ap = apply_H(I, H_ap, 'keepOriginalPositions');
+figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
+
+% ToDo: compute the transformed lines lr1, lr2, lr3, lr4
+points = [p1 p2 p3 p4 p5 p6 p7 p8];
+newPoints  = apply_H_toPoints( H_ap, points );
+
+lr1 = computeLine( newPoints(:,1),  newPoints(:,2));
+lr2 = computeLine( newPoints(:,3),  newPoints(:,4));
+lr3 = computeLine( newPoints(:,5),  newPoints(:,6));
+lr4 = computeLine( newPoints(:,7),  newPoints(:,8));
+
+% show the transformed lines in the transformed image
+figure(12);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
+hold on;
+t=1:0.1:1000;
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'y');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
+
+% to evaluate the results, compute the angle between the different pair 
+% of lines before and after the image transformation
+
+norml1 = [l1(1)/l1(3), l1(2)/l1(3)];
+norml2 = [l2(1)/l2(3), l2(2)/l2(3)];
+norml3 = [l3(1)/l1(3), l3(2)/l3(3)];
+norml4 = [l4(1)/l4(3), l4(2)/l4(3)];
+
+normlr1 = [lr1(1)/lr1(3), lr1(2)/lr1(3)];
+normlr2 = [lr2(1)/lr2(3), lr2(2)/lr2(3)];
+normlr3 = [lr3(1)/lr1(3), lr3(2)/lr3(3)];
+normlr4 = [lr4(1)/lr4(3), lr4(2)/lr4(3)];
+
+angle13 = acosd(dot(norml1,norml3)/(norm(norml1)*norm(norml3)));
+angler13 = acosd(dot(normlr1,normlr3)/(norm(normlr1)*norm(normlr3)));
+
+angle14 = acosd(dot(norml1,norml4)/(norm(norml1)*norm(norml4)));
+angler14 = acosd(dot(normlr1,normlr4)/(norm(normlr1)*norm(normlr4)));
+
+angle23 = acosd(dot(norml2,norml3)/(norm(norml2)*norm(norml3)));
+angler23 = acosd(dot(normlr2,normlr3)/(norm(normlr2)*norm(normlr3)));
+
+angle24 = acosd(dot(norml2,norml4)/(norm(norml2)*norm(norml4)));
+angler24 = acosd(dot(normlr2,normlr4)/(norm(normlr2)*norm(normlr4)));
+
+disp(['Upper left corner before transformation: ' , num2str(angle13), 'º']);
+disp(['Upper left corner after transformation: ' , num2str(angler13), 'º']);
+disp(' ');
+
+disp(['Upper right corner before transformation: ' , num2str(angle14), 'º']);
+disp(['Upper right corner after transformation: ' , num2str(angler14), 'º']);
+disp(' ');
+
+disp(['Lower left corner before transformation: ' , num2str(angle23), 'º']);
+disp(['Lower left corner after transformation: ' , num2str(angler23), 'º']);
+disp(' ');
+
+disp(['Lower right corner before transformation: ' , num2str(angle24), 'º']);
+disp(['Lower right corner after transformation: ' , num2str(angler24), 'º']);
+disp(' ');
 
 %% 8. OPTIONAL: Metric Rectification of the left facade of image 0001
