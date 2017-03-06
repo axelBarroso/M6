@@ -97,8 +97,9 @@ figure(8); imshow(uint8(I_aux)); title('Planar transformations: Affine (Apply ma
 
 %% 1.3 Projective transformations (homographies)
 % ToDo: generate a matrix H which produces a projective transformation
+H = [0.7 -1 -0.5; 0.2 0.8 -1; 0.00004 0 -1];
 I2 = apply_H(I, H);
-figure(9); imshow(uint8(I2));title('Projective transformations: Not DONE !! ')
+figure(9); imshow(uint8(I2));title('Projective transformations')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
@@ -288,11 +289,22 @@ plot(t, -(lrr6(1)*t + lrr6(3)) / lrr6(2), 'r');
 
 % ToDo: to evaluate the results, compute the angle between the different pair 
 % of lines before and after the image transformation
-angle13 = acosd(dot(lr1,lr3)/(norm(lr1)*norm(lr3)));
-angler13 = acosd(dot(lrr1,lrr3)/(norm(lrr1)*norm(lrr3)));
+% get normalized version of lines (two coordinates)
+normlr1 = [lr1(1), lr1(2)];
+normlr3 = [lr3(1), lr3(2)];
+normlr5 = [lr5(1), lr5(2)];
+normlr6 = [lr6(1), lr6(2)];
 
-angle56 = acosd(dot(lr5,lr6)/(norm(lr5)*norm(lr6)));
-angler56 = acosd(dot(lrr5,lrr6)/(norm(lrr5)*norm(lrr6)));
+normlrr1 = [lrr1(1), lrr1(2)];
+normlrr3 = [lrr3(1), lrr3(2)];
+normlrr5 = [lrr5(1), lrr5(2)];
+normlrr6 = [lrr6(1), lrr6(2)];
+
+angle13 = acosd(dot(normlr1,normlr3)/(norm(normlr1)*norm(normlr3)));
+angler13 = acosd(dot(normlrr1,normlrr3)/(norm(normlrr1)*norm(normlrr3)));
+
+angle56 = acosd(dot(normlr5,normlr6)/(norm(normlr5)*norm(normlr6)));
+angler56 = acosd(dot(normlrr5,normlrr6)/(norm(normlrr5)*norm(normlrr6)));
 
 disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'º']);
 disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'º']);
