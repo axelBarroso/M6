@@ -26,7 +26,7 @@ H = [1 0 100;
 I2 = apply_H(I, H, 'keepOriginalPositions');
 figure(2); imshow(uint8(I2)); title('Planar transformations: Translation');
 
-% Matrix H with rotation of 20ยบ
+% Matrix H with rotation of 20บ
 H = [cosd(20) -sind(20) 0; 
      sind(20) cosd(20) 0;
      0 0 1];
@@ -207,20 +207,20 @@ angler23 = acosd(dot(normlr2,normlr3)/(norm(normlr2)*norm(normlr3)));
 angle24= acosd(dot(norml2,norml4)/(norm(norml2)*norm(norml4)));
 angler24 = acosd(dot(normlr2,normlr4)/(norm(normlr2)*norm(normlr4)));
 
-disp(['Upper left corner before transformation: ' , num2str(angle13), 'ยบ']);
-disp(['Upper left corner after transformation: ' , num2str(angler13), 'ยบ']);
+disp(['Upper left corner before transformation: ' , num2str(angle13), 'บ']);
+disp(['Upper left corner after transformation: ' , num2str(angler13), 'บ']);
 disp(' ');
 
-disp(['Upper right corner before transformation: ' , num2str(angle14), 'ยบ']);
-disp(['Upper right corner after transformation: ' , num2str(angler14), 'ยบ']);
+disp(['Upper right corner before transformation: ' , num2str(angle14), 'บ']);
+disp(['Upper right corner after transformation: ' , num2str(angler14), 'บ']);
 disp(' ');
 
-disp(['Lower left corner before transformation: ' , num2str(angle23), 'ยบ']);
-disp(['Lower left corner after transformation: ' , num2str(angler23), 'ยบ']);
+disp(['Lower left corner before transformation: ' , num2str(angle23), 'บ']);
+disp(['Lower left corner after transformation: ' , num2str(angler23), 'บ']);
 disp(' ');
 
-disp(['Lower right corner before transformation: ' , num2str(angle24), 'ยบ']);
-disp(['Lower right corner after transformation: ' , num2str(angler24), 'ยบ']);
+disp(['Lower right corner before transformation: ' , num2str(angle24), 'บ']);
+disp(['Lower right corner after transformation: ' , num2str(angler24), 'บ']);
 disp(' ');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Metric Rectification
@@ -306,12 +306,12 @@ angler13 = acosd(dot(normlrr1,normlrr3)/(norm(normlrr1)*norm(normlrr3)));
 angle56 = acosd(dot(normlr5,normlr6)/(norm(normlr5)*norm(normlr6)));
 angler56 = acosd(dot(normlrr5,normlrr6)/(norm(normlrr5)*norm(normlrr6)));
 
-disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'ยบ']);
-disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'ยบ']);
+disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'บ']);
+disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'บ']);
 disp(' ');
 
-disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'ยบ']);
-disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'ยบ']);
+disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'บ']);
+disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'บ']);
 disp(' ');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Metric Rectification in a single step
@@ -476,7 +476,7 @@ lr5 = computeLine( newPoints(:,9),  newPoints(:,10));
 lr6 = computeLine( newPoints(:,11),  newPoints(:,12));
 
 % show the transformed lines in the transformed image
-figure(12);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
+figure(18);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -510,20 +510,20 @@ angler23 = acosd(dot(normlr2,normlr3)/(norm(normlr2)*norm(normlr3)));
 angle24 = acosd(dot(norml2,norml4)/(norm(norml2)*norm(norml4)));
 angler24 = acosd(dot(normlr2,normlr4)/(norm(normlr2)*norm(normlr4)));
 
-disp(['Upper left corner before transformation: ' , num2str(angle13), 'ยบ']);
-disp(['Upper left corner after transformation: ' , num2str(angler13), 'ยบ']);
+disp(['Upper left corner before transformation: ' , num2str(angle13), 'บ']);
+disp(['Upper left corner after transformation: ' , num2str(angler13), 'บ']);
 disp(' ');
 
-disp(['Upper right corner before transformation: ' , num2str(angle14), 'ยบ']);
-disp(['Upper right corner after transformation: ' , num2str(angler14), 'ยบ']);
+disp(['Upper right corner before transformation: ' , num2str(angle14), 'บ']);
+disp(['Upper right corner after transformation: ' , num2str(angler14), 'บ']);
 disp(' ');
 
-disp(['Lower left corner before transformation: ' , num2str(angle23), 'ยบ']);
-disp(['Lower left corner after transformation: ' , num2str(angler23), 'ยบ']);
+disp(['Lower left corner before transformation: ' , num2str(angle23), 'บ']);
+disp(['Lower left corner after transformation: ' , num2str(angler23), 'บ']);
 disp(' ');
 
-disp(['Lower right corner before transformation: ' , num2str(angle24), 'ยบ']);
-disp(['Lower right corner after transformation: ' , num2str(angler24), 'ยบ']);
+disp(['Lower right corner before transformation: ' , num2str(angle24), 'บ']);
+disp(['Lower right corner after transformation: ' , num2str(angler24), 'บ']);
 disp(' ');
 
 
@@ -542,7 +542,7 @@ l5 = computeLine( p9, p10);
 l6 = computeLine( p11, p12);
 
 
-figure(50);imshow(I);
+figure(19);imshow(I);
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -556,7 +556,7 @@ lr3 = lr3 / lr3(3);
 lr5 = lr5 / lr5(3);
 lr6 = lr6 / lr6(3);
 
-figure(51);imshow(uint8(I_ap)); title('Before metric rectification.')
+figure(20);imshow(uint8(I_ap)); title('Before metric rectification.')
 hold on;
 t=1:0.1:1000;
 
@@ -621,12 +621,12 @@ angler13 = acosd(dot(normlrr1,normlrr3)/(norm(normlrr1)*norm(normlrr3)));
 angle56 = acosd(dot(normlr5,normlr6)/(norm(normlr5)*norm(normlr6)));
 angler56 = acosd(dot(normlrr5,normlrr6)/(norm(normlrr5)*norm(normlrr6)));
 
-disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'ยบ']);
-disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'ยบ']);
+disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'บ']);
+disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'บ']);
 disp(' ');
 
-disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'ยบ']);
-disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'ยบ']);
+disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'บ']);
+disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'บ']);
 disp(' ');
 
 %% 7. OPTIONAL: Affine Rectification of the left facade of image 0001
@@ -663,7 +663,7 @@ l5 = computeLine( p9, p10);
 l6 = computeLine( p11, p12);
 
 % show the chosen lines in the image
-figure(10);imshow(I);
+figure(21);imshow(I);
 hold on;
 t=1:0.1:1000;
 plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
@@ -685,7 +685,7 @@ l_inf = l_inf / l_inf(3);
 
 H_ap = [1 0 0; 0 1 0; l_inf];
 I_ap = apply_H(I, H_ap, 'keepOriginalPositions');
-figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
+figure(22); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 points = [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12];
@@ -699,7 +699,7 @@ lr5 = computeLine( newPoints(:,9),  newPoints(:,10));
 lr6 = computeLine( newPoints(:,11),  newPoints(:,12));
 
 % show the transformed lines in the transformed image
-figure(12);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
+figure(23);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -732,20 +732,20 @@ angler23 = acosd(dot(normlr2,normlr3)/(norm(normlr2)*norm(normlr3)));
 angle24 = acosd(dot(norml2,norml4)/(norm(norml2)*norm(norml4)));
 angler24 = acosd(dot(normlr2,normlr4)/(norm(normlr2)*norm(normlr4)));
 
-disp(['Upper left corner before transformation: ' , num2str(angle13), 'ยบ']);
-disp(['Upper left corner after transformation: ' , num2str(angler13), 'ยบ']);
+disp(['Upper left corner before transformation: ' , num2str(angle13), 'บ']);
+disp(['Upper left corner after transformation: ' , num2str(angler13), 'บ']);
 disp(' ');
 
-disp(['Upper right corner before transformation: ' , num2str(angle14), 'ยบ']);
-disp(['Upper right corner after transformation: ' , num2str(angler14), 'ยบ']);
+disp(['Upper right corner before transformation: ' , num2str(angle14), 'บ']);
+disp(['Upper right corner after transformation: ' , num2str(angler14), 'บ']);
 disp(' ');
 
-disp(['Lower left corner before transformation: ' , num2str(angle23), 'ยบ']);
-disp(['Lower left corner after transformation: ' , num2str(angler23), 'ยบ']);
+disp(['Lower left corner before transformation: ' , num2str(angle23), 'บ']);
+disp(['Lower left corner after transformation: ' , num2str(angler23), 'บ']);
 disp(' ');
 
-disp(['Lower right corner before transformation: ' , num2str(angle24), 'ยบ']);
-disp(['Lower right corner after transformation: ' , num2str(angler24), 'ยบ']);
+disp(['Lower right corner before transformation: ' , num2str(angle24), 'บ']);
+disp(['Lower right corner after transformation: ' , num2str(angler24), 'บ']);
 disp(' ');
 
 %% 8. OPTIONAL: Metric Rectification of the left facade of image 0001
@@ -755,7 +755,7 @@ lr3 = computeLine(newPoints(:,5), newPoints(:,6));
 lr5 = computeLine(newPoints(:,9), newPoints(:,10));
 lr6 = computeLine(newPoints(:,11), newPoints(:,12));
 
-figure(50);imshow(I);
+figure(24);imshow(I);
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -769,7 +769,7 @@ lr3 = lr3 / lr3(3);
 lr5 = lr5 / lr5(3);
 lr6 = lr6 / lr6(3);
 
-figure(51);imshow(uint8(I_ap)); title('Before metric rectification.')
+figure(25);imshow(uint8(I_ap)); title('Before metric rectification.')
 hold on;
 t=1:0.1:1000;
 
@@ -807,7 +807,7 @@ lrr5 = lrr5 / lrr5(3);
 lrr6 = lrr6 / lrr6(3);
 
 % show the transformed lines in the transformed image
-figure(15);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
+figure(26);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
@@ -834,10 +834,10 @@ angler13 = acosd(dot(normlrr1,normlrr3)/(norm(normlrr1)*norm(normlrr3)));
 angle56 = acosd(dot(normlr5,normlr6)/(norm(normlr5)*norm(normlr6)));
 angler56 = acosd(dot(normlrr5,normlrr6)/(norm(normlrr5)*norm(normlrr6)));
 
-disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'ยบ']);
-disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'ยบ']);
+disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'บ']);
+disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'บ']);
 disp(' ');
 
-disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'ยบ']);
-disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'ยบ']);
+disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'บ']);
+disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'บ']);
 disp(' ');
