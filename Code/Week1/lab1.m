@@ -403,6 +403,7 @@ I_out =I;
 figure(17); imshow(uint8(I_out)); title('Direct metric rectification via orthogonal lines.')
 
 %% 5. OPTIONAL: Affine Rectification of the left facade of image 0000
+% choose the image points
 I = imread('Data/0000_s.png');
 A = load('Data/0000_s_info_lines.txt');
 
@@ -420,21 +421,33 @@ i = 508;
 p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
 
+i = 192; %6; % 62
+p9 = [A(i,1) A(i,2) 1]';
+p10 = [A(i,3) A(i,4) 1]';
+i = 195; %7; % 67 
+p11 = [A(i,1) A(i,2) 1]';
+p12 = [A(i,3) A(i,4) 1]';
+
 % compute the lines l1, l2, l3, l4, that pass through the different pairs of points
 l1 = computeLine( p1, p2);
 l2 = computeLine( p3, p4);
 l3 = computeLine( p5, p6);
 l4 = computeLine( p7, p8);
+l5 = computeLine( p9, p10);
+l6 = computeLine( p11, p12);
 
 % show the chosen lines in the image
-
 figure(10);imshow(I);
 hold on;
 t=1:0.1:1000;
 plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
+
 plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
 plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
 plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
+
+% plot(t, -(l5(1)*t + l5(3)) / l5(2), 'r');
+% plot(t, -(l6(1)*t + l6(3)) / l6(2), 'r');
 
 
 % ToDo: compute the homography that affinely rectifies the image
@@ -448,16 +461,18 @@ l_inf = l_inf / l_inf(3);
 
 H_ap = [1 0 0; 0 1 0; l_inf];
 I_ap = apply_H(I, H_ap, 'keepOriginalPositions');
-figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
+% figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-points = [p1 p2 p3 p4 p5 p6 p7 p8];
+points = [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12];
 newPoints  = apply_H_toPoints( H_ap, points );
 
 lr1 = computeLine( newPoints(:,1),  newPoints(:,2));
 lr2 = computeLine( newPoints(:,3),  newPoints(:,4));
 lr3 = computeLine( newPoints(:,5),  newPoints(:,6));
 lr4 = computeLine( newPoints(:,7),  newPoints(:,8));
+lr5 = computeLine( newPoints(:,9),  newPoints(:,10));
+lr6 = computeLine( newPoints(:,11),  newPoints(:,12));
 
 % show the transformed lines in the transformed image
 figure(12);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
@@ -467,6 +482,7 @@ plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
 plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'y');
 plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
 plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
+
 
 % to evaluate the results, compute the angle between the different pair 
 % of lines before and after the image transformation
@@ -512,6 +528,106 @@ disp(' ');
 
 %% 6. OPTIONAL: Metric Rectification of the left facade of image 0000
 
+%{
+lr1 = computeLine( newPoints(:,1),  newPoints(:,2));
+lr3 = computeLine( newPoints(:,5),  newPoints(:,6));
+lr5 = computeLine( newPoints(:,9), newPoints(:,10));
+lr6 = computeLine( newPoints(:,11), newPoints(:,12));
+%}
+
+l1 = computeLine( p1, p2);
+l3 = computeLine( p5, p6);
+l5 = computeLine( p9, p10);
+l6 = computeLine( p11, p12);
+
+
+figure(50);imshow(I);
+hold on;
+t=1:0.1:1000;
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr5(1)*t + lr5(3)) / lr5(2), 'r');
+plot(t, -(lr6(1)*t + lr6(3)) / lr6(2), 'r');
+
+% normalize orthogonal lines so that they have 2 elements
+lr1 = lr1 / lr1(3);
+lr3 = lr3 / lr3(3);
+lr5 = lr5 / lr5(3);
+lr6 = lr6 / lr6(3);
+
+figure(51);imshow(uint8(I_ap)); title('Before metric rectification.')
+hold on;
+t=1:0.1:1000;
+
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr5(1)*t + lr5(3)) / lr5(2), 'r');
+plot(t, -(lr6(1)*t + lr6(3)) / lr6(2), 'r');
+
+n = [lr5(1)*lr6(1), lr5(1)*lr6(2) + lr5(2)*lr6(1), lr5(2)*lr6(2) ; ...
+     lr1(1)*lr3(1), lr1(1)*lr3(2) + lr1(2)*lr3(1), lr1(2)*lr3(2)];
+ 
+s = null(n);
+S = [s(1) s(2);s(2) s(3)];
+% Cholesky decomposition
+K = chol(S,'upper');
+
+
+H_sa = [K [0; 0]; 0 0 1];
+H_sa = inv(H_sa);
+I_sa = apply_H(I_ap, H_sa);
+% figure(14); imshow(uint8(I_sa)); title('Metric rectification via orthogonal lines.')
+
+% Compute image with lines
+newPoints_sa  = apply_H_toPoints( H_sa, newPoints );
+
+lrr1 = computeLine( newPoints_sa(:,1),  newPoints_sa(:,2));
+lrr3 = computeLine( newPoints_sa(:,5),  newPoints_sa(:,6));
+lrr5 = computeLine( newPoints_sa(:,9) , newPoints_sa(:,10));
+lrr6 = computeLine( newPoints_sa(:,11), newPoints_sa(:,12));
+
+% normalize orthogonal lines so that they have 2 elements
+lrr1 = lrr1 / lrr1(3);
+lrr3 = lrr3 / lrr3(3);
+lrr5 = lrr5 / lrr5(3);
+lrr6 = lrr6 / lrr6(3);
+
+% show the transformed lines in the transformed image
+% figure(15);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
+hold on;
+t=1:0.1:1000;
+plot(t, -(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
+plot(t, -(lrr3(1)*t + lrr3(3)) / lrr3(2), 'y');
+plot(t, -(lrr5(1)*t + lrr5(3)) / lrr5(2), 'r');
+plot(t, -(lrr6(1)*t + lrr6(3)) / lrr6(2), 'r');
+
+% ToDo: to evaluate the results, compute the angle between the different pair 
+% of lines before and after the image transformation
+% get normalized version of lines (two coordinates)
+normlr1 = [lr1(1), lr1(2)];
+normlr3 = [lr3(1), lr3(2)];
+normlr5 = [lr5(1), lr5(2)];
+normlr6 = [lr6(1), lr6(2)];
+
+normlrr1 = [lrr1(1), lrr1(2)];
+normlrr3 = [lrr3(1), lrr3(2)];
+normlrr5 = [lrr5(1), lrr5(2)];
+normlrr6 = [lrr6(1), lrr6(2)];
+
+angle13 = acosd(dot(normlr1,normlr3)/(norm(normlr1)*norm(normlr3)));
+angler13 = acosd(dot(normlrr1,normlrr3)/(norm(normlrr1)*norm(normlrr3)));
+
+angle56 = acosd(dot(normlr5,normlr6)/(norm(normlr5)*norm(normlr6)));
+angler56 = acosd(dot(normlrr5,normlrr6)/(norm(normlrr5)*norm(normlrr6)));
+
+disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'º']);
+disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'º']);
+disp(' ');
+
+disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'º']);
+disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'º']);
+disp(' ');
+
 %% 7. OPTIONAL: Affine Rectification of the left facade of image 0001
 I = imread('Data/0001_s.png');
 A = load('Data/0001_s_info_lines.txt');
@@ -530,14 +646,22 @@ i = 541;
 p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
 
+i = 1;
+p9 = [A(i,1) A(i,2) 1]';
+p10 = [A(i,3) A(i,4) 1]';
+i = 5;
+p11 = [A(i,1) A(i,2) 1]';
+p12 = [A(i,3) A(i,4) 1]';
+
 % compute the lines l1, l2, l3, l4, that pass through the different pairs of points
 l1 = computeLine( p1, p2);
 l2 = computeLine( p3, p4);
 l3 = computeLine( p5, p6);
 l4 = computeLine( p7, p8);
+l5 = computeLine( p9, p10);
+l6 = computeLine( p11, p12);
 
 % show the chosen lines in the image
-
 figure(10);imshow(I);
 hold on;
 t=1:0.1:1000;
@@ -545,6 +669,9 @@ plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
 plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
 plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
 plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
+
+% plot(t, -(l5(1)*t + l5(3)) / l5(2), 'r');
+% plot(t, -(l6(1)*t + l6(3)) / l6(2), 'r');
 
 % ToDo: compute the homography that affinely rectifies the image
 % Compute vanishing points
@@ -560,13 +687,15 @@ I_ap = apply_H(I, H_ap, 'keepOriginalPositions');
 figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-points = [p1 p2 p3 p4 p5 p6 p7 p8];
+points = [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12];
 newPoints  = apply_H_toPoints( H_ap, points );
 
 lr1 = computeLine( newPoints(:,1),  newPoints(:,2));
 lr2 = computeLine( newPoints(:,3),  newPoints(:,4));
 lr3 = computeLine( newPoints(:,5),  newPoints(:,6));
 lr4 = computeLine( newPoints(:,7),  newPoints(:,8));
+lr5 = computeLine( newPoints(:,9),  newPoints(:,10));
+lr6 = computeLine( newPoints(:,11),  newPoints(:,12));
 
 % show the transformed lines in the transformed image
 figure(12);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
@@ -619,3 +748,95 @@ disp(['Lower right corner after transformation: ' , num2str(angler24), 'º']);
 disp(' ');
 
 %% 8. OPTIONAL: Metric Rectification of the left facade of image 0001
+
+lr1 = computeLine(newPoints(:,1), newPoints(:,2));
+lr3 = computeLine(newPoints(:,5), newPoints(:,6));
+lr5 = computeLine(newPoints(:,9), newPoints(:,10));
+lr6 = computeLine(newPoints(:,11), newPoints(:,12));
+
+figure(50);imshow(I);
+hold on;
+t=1:0.1:1000;
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr5(1)*t + lr5(3)) / lr5(2), 'r');
+plot(t, -(lr6(1)*t + lr6(3)) / lr6(2), 'r');
+
+% normalize orthogonal lines so that they have 2 elements
+lr1 = lr1 / lr1(3);
+lr3 = lr3 / lr3(3);
+lr5 = lr5 / lr5(3);
+lr6 = lr6 / lr6(3);
+
+figure(51);imshow(uint8(I_ap)); title('Before metric rectification.')
+hold on;
+t=1:0.1:1000;
+
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr5(1)*t + lr5(3)) / lr5(2), 'r');
+plot(t, -(lr6(1)*t + lr6(3)) / lr6(2), 'r');
+
+n = [lr5(1)*lr6(1), lr5(1)*lr6(2) + lr5(2)*lr6(1), lr5(2)*lr6(2) ; ...
+     lr1(1)*lr3(1), lr1(1)*lr3(2) + lr1(2)*lr3(1), lr1(2)*lr3(2)];
+ 
+s = null(n);
+S = [s(1) s(2);s(2) s(3)];
+% Cholesky decomposition
+K = chol(S,'upper');
+
+
+H_sa = [K [0; 0]; 0 0 1];
+H_sa = inv(H_sa);
+I_sa = apply_H(I_ap, H_sa);
+figure(14); imshow(uint8(I_sa)); title('Metric rectification via orthogonal lines.')
+
+% Compute image with lines
+newPoints_sa  = apply_H_toPoints( H_sa, newPoints );
+
+lrr1 = computeLine( newPoints_sa(:,1),  newPoints_sa(:,2));
+lrr3 = computeLine( newPoints_sa(:,5),  newPoints_sa(:,6));
+lrr5 = computeLine( newPoints_sa(:,9) , newPoints_sa(:,10));
+lrr6 = computeLine( newPoints_sa(:,11), newPoints_sa(:,12));
+
+% normalize orthogonal lines so that they have 2 elements
+lrr1 = lrr1 / lrr1(3);
+lrr3 = lrr3 / lrr3(3);
+lrr5 = lrr5 / lrr5(3);
+lrr6 = lrr6 / lrr6(3);
+
+% show the transformed lines in the transformed image
+figure(15);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
+hold on;
+t=1:0.1:1000;
+plot(t, -(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
+plot(t, -(lrr3(1)*t + lrr3(3)) / lrr3(2), 'y');
+plot(t, -(lrr5(1)*t + lrr5(3)) / lrr5(2), 'r');
+plot(t, -(lrr6(1)*t + lrr6(3)) / lrr6(2), 'r');
+
+% ToDo: to evaluate the results, compute the angle between the different pair 
+% of lines before and after the image transformation
+% get normalized version of lines (two coordinates)
+normlr1 = [lr1(1), lr1(2)];
+normlr3 = [lr3(1), lr3(2)];
+normlr5 = [lr5(1), lr5(2)];
+normlr6 = [lr6(1), lr6(2)];
+
+normlrr1 = [lrr1(1), lrr1(2)];
+normlrr3 = [lrr3(1), lrr3(2)];
+normlrr5 = [lrr5(1), lrr5(2)];
+normlrr6 = [lrr6(1), lrr6(2)];
+
+angle13 = acosd(dot(normlr1,normlr3)/(norm(normlr1)*norm(normlr3)));
+angler13 = acosd(dot(normlrr1,normlrr3)/(norm(normlrr1)*norm(normlrr3)));
+
+angle56 = acosd(dot(normlr5,normlr6)/(norm(normlr5)*norm(normlr6)));
+angler56 = acosd(dot(normlrr5,normlrr6)/(norm(normlrr5)*norm(normlrr6)));
+
+disp(['Crossing point yellow lines before transformation: ' , num2str(angle13), 'º']);
+disp(['Crossing point yellow lines after transformation: ' , num2str(angler13), 'º']);
+disp(' ');
+
+disp(['Crossing point red lines before transformation: ' , num2str(angle56), 'º']);
+disp(['Crossing point red lines after transformation: ' , num2str(angler56), 'º']);
+disp(' ');
