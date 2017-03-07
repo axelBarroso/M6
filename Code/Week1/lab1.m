@@ -438,7 +438,7 @@ l5 = computeLine( p9, p10);
 l6 = computeLine( p11, p12);
 
 % show the chosen lines in the image
-figure(10);imshow(I);
+figure(17);imshow(I);
 hold on;
 t=1:0.1:1000;
 plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
@@ -462,7 +462,7 @@ l_inf = l_inf / l_inf(3);
 
 H_ap = [1 0 0; 0 1 0; l_inf];
 I_ap = apply_H(I, H_ap, 'keepOriginalPositions');
-% figure(11); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
+figure(18); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 points = [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12];
@@ -476,7 +476,7 @@ lr5 = computeLine( newPoints(:,9),  newPoints(:,10));
 lr6 = computeLine( newPoints(:,11),  newPoints(:,12));
 
 % show the transformed lines in the transformed image
-figure(18);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
+figure(19);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -529,20 +529,20 @@ disp(' ');
 
 %% 6. OPTIONAL: Metric Rectification of the left facade of image 0000
 
-%{
+
 lr1 = computeLine( newPoints(:,1),  newPoints(:,2));
 lr3 = computeLine( newPoints(:,5),  newPoints(:,6));
-lr5 = computeLine( newPoints(:,9), newPoints(:,10));
-lr6 = computeLine( newPoints(:,11), newPoints(:,12));
-%}
-
-l1 = computeLine( p1, p2);
-l3 = computeLine( p5, p6);
-l5 = computeLine( p9, p10);
-l6 = computeLine( p11, p12);
+lr5 = computeLine( newPoints(:,3), newPoints(:,2));
+lr6 = computeLine( newPoints(:,4), newPoints(:,1));
 
 
-figure(19);imshow(I);
+% l1 = computeLine( p1, p2);
+% l3 = computeLine( p5, p6);
+% l5 = computeLine( p3, p2);
+% l6 = computeLine( p4, p1);
+
+
+figure(20);imshow(uint8(I_ap));
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -556,7 +556,7 @@ lr3 = lr3 / lr3(3);
 lr5 = lr5 / lr5(3);
 lr6 = lr6 / lr6(3);
 
-figure(20);imshow(uint8(I_ap)); title('Before metric rectification.')
+figure(21);imshow(uint8(I_ap)); title('Before metric rectification.')
 hold on;
 t=1:0.1:1000;
 
@@ -577,15 +577,15 @@ K = chol(S,'upper');
 H_sa = [K [0; 0]; 0 0 1];
 H_sa = inv(H_sa);
 I_sa = apply_H(I_ap, H_sa);
-% figure(14); imshow(uint8(I_sa)); title('Metric rectification via orthogonal lines.')
+figure(21); imshow(uint8(I_sa)); title('Metric rectification via orthogonal lines.')
 
 % Compute image with lines
 newPoints_sa  = apply_H_toPoints( H_sa, newPoints );
 
 lrr1 = computeLine( newPoints_sa(:,1),  newPoints_sa(:,2));
 lrr3 = computeLine( newPoints_sa(:,5),  newPoints_sa(:,6));
-lrr5 = computeLine( newPoints_sa(:,9) , newPoints_sa(:,10));
-lrr6 = computeLine( newPoints_sa(:,11), newPoints_sa(:,12));
+lrr5 = computeLine( newPoints_sa(:,3) , newPoints_sa(:,2));
+lrr6 = computeLine( newPoints_sa(:,4), newPoints_sa(:,1));
 
 % normalize orthogonal lines so that they have 2 elements
 lrr1 = lrr1 / lrr1(3);
@@ -594,7 +594,7 @@ lrr5 = lrr5 / lrr5(3);
 lrr6 = lrr6 / lrr6(3);
 
 % show the transformed lines in the transformed image
-% figure(15);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
+figure(22);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
@@ -663,7 +663,7 @@ l5 = computeLine( p9, p10);
 l6 = computeLine( p11, p12);
 
 % show the chosen lines in the image
-figure(21);imshow(I);
+figure(23);imshow(I);
 hold on;
 t=1:0.1:1000;
 plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
@@ -685,7 +685,7 @@ l_inf = l_inf / l_inf(3);
 
 H_ap = [1 0 0; 0 1 0; l_inf];
 I_ap = apply_H(I, H_ap, 'keepOriginalPositions');
-figure(22); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
+figure(24); imshow(uint8(I_ap)); title('Affine rectification via the vanishing line')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 points = [p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12];
@@ -699,7 +699,7 @@ lr5 = computeLine( newPoints(:,9),  newPoints(:,10));
 lr6 = computeLine( newPoints(:,11),  newPoints(:,12));
 
 % show the transformed lines in the transformed image
-figure(23);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
+figure(25);imshow(uint8(I_ap)); title('Affine rectification. Rectificated lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -751,11 +751,11 @@ disp(' ');
 %% 8. OPTIONAL: Metric Rectification of the left facade of image 0001
 
 lr1 = computeLine(newPoints(:,1), newPoints(:,2));
-lr3 = computeLine(newPoints(:,5), newPoints(:,6));
-lr5 = computeLine(newPoints(:,9), newPoints(:,10));
-lr6 = computeLine(newPoints(:,11), newPoints(:,12));
+lr3 = computeLine(newPoints(:,3), newPoints(:,1));
+lr5 = computeLine(newPoints(:,3), newPoints(:,2));
+lr6 = computeLine(newPoints(:,4), newPoints(:,1));
 
-figure(24);imshow(I);
+figure(26);imshow(uint8(I_ap));
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -769,7 +769,7 @@ lr3 = lr3 / lr3(3);
 lr5 = lr5 / lr5(3);
 lr6 = lr6 / lr6(3);
 
-figure(25);imshow(uint8(I_ap)); title('Before metric rectification.')
+figure(27);imshow(uint8(I_ap)); title('Before metric rectification.')
 hold on;
 t=1:0.1:1000;
 
@@ -790,15 +790,15 @@ K = chol(S,'upper');
 H_sa = [K [0; 0]; 0 0 1];
 H_sa = inv(H_sa);
 I_sa = apply_H(I_ap, H_sa);
-figure(14); imshow(uint8(I_sa)); title('Metric rectification via orthogonal lines.')
+figure(28); imshow(uint8(I_sa)); title('Metric rectification via orthogonal lines.')
 
 % Compute image with lines
 newPoints_sa  = apply_H_toPoints( H_sa, newPoints );
 
 lrr1 = computeLine( newPoints_sa(:,1),  newPoints_sa(:,2));
-lrr3 = computeLine( newPoints_sa(:,5),  newPoints_sa(:,6));
-lrr5 = computeLine( newPoints_sa(:,9) , newPoints_sa(:,10));
-lrr6 = computeLine( newPoints_sa(:,11), newPoints_sa(:,12));
+lrr3 = computeLine( newPoints_sa(:,1),  newPoints_sa(:,3));
+lrr5 = computeLine( newPoints_sa(:,2) , newPoints_sa(:,3));
+lrr6 = computeLine( newPoints_sa(:,1), newPoints_sa(:,4));
 
 % normalize orthogonal lines so that they have 2 elements
 lrr1 = lrr1 / lrr1(3);
@@ -807,9 +807,9 @@ lrr5 = lrr5 / lrr5(3);
 lrr6 = lrr6 / lrr6(3);
 
 % show the transformed lines in the transformed image
-figure(26);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
+figure(29);imshow(uint8(I_sa)); title('Metric rectification. Rectificated lines')
 hold on;
-t=1:0.1:1000;
+t=1:0.1:10000;
 plot(t, -(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
 plot(t, -(lrr3(1)*t + lrr3(3)) / lrr3(2), 'y');
 plot(t, -(lrr5(1)*t + lrr5(3)) / lrr5(2), 'r');
