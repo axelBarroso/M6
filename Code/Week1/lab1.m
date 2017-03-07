@@ -395,13 +395,14 @@ c = [l1(1)*l2(1) , (l1(1)*l2(2)  + l1(2)*l2(1))/2 , l1(2)*l2(2) , (l1(1)+l2(1))/
      l9(1)*l10(1), (l9(1)*l10(2) + l9(2)*l10(1))/2, l9(2)*l10(2), (l9(1)+l10(1))/2, (l9(2)+l10(2))/2, 1];
      
 c = null(c);
-% Get C* from c coefficients
-Cmatrix = [c(1) c(2)/2 c(4)/2 ; c(2)/2 c(3) c(5)/2; c(4)/2 c(5)/2 c(6)];
+% Get the "projected" conic matrix (C*') from c coefficients. (Cprojected)
+Cprojected = [c(1) c(2)/2 c(4)/2 ; c(2)/2 c(3) c(5)/2; c(4)/2 c(5)/2 c(6)];
 
+[U,S,V] = svd(Cprojected);
+H = inv(U);
 
-I_out =I;
+I_out = apply_H(I, H);
 figure(17); imshow(uint8(I_out)); title('Direct metric rectification via orthogonal lines.')
-
 %% 5. OPTIONAL: Affine Rectification of the left facade of image 0000
 % choose the image points
 I = imread('Data/0000_s.png');

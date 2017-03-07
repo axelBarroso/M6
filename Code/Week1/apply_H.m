@@ -1,5 +1,3 @@
-
-
 function [ outI ] = apply_H(I, H, reference)
 % apply_H function that applies transformation H to image I
 % returns image outI. 
