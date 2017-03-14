@@ -46,10 +46,10 @@ function idx_inliers = compute_inliers(H, x1, x2, th)
     x1 = normalise(x1);
     x2 = normalise(x2);
     
-    dist_x1_to_H_x2 = ((H_x2(1,:)-x1(1,:)).^2 + (H_x2(2,:)-x1(2,:)).^2 + (H_x2(3,:)-x1(3,:)).^2);
-    dist_x2_to_H_x1 = ((x2(1,:)-H_x1(1,:)).^2 + (x2(2,:)-H_x1(2,:)).^2 + (x2(3,:)-H_x1(3,:)).^2);
-
-    d2 = dist_x1_to_H_x2 + dist_x2_to_H_x1; % ToDo
+    % ToDo
+    % x2 to H_x1 and H_x2 to x1
+    d2 = ((x2(1,:)-H_x1(1,:)).^2 + (x2(2,:)-H_x1(2,:)).^2 + (x2(3,:)-H_x1(3,:)).^2) ...
+        + ((H_x2(1,:)-x1(1,:)).^2 + (H_x2(2,:)-x1(2,:)).^2 + (H_x2(3,:)-x1(3,:)).^2);
     
     idx_inliers = find(d2 < th.^2);
 
