@@ -1,5 +1,5 @@
 function H = homography2d(x,xp)
-% Reboust homography computation by means of the 
+% Rebust homography computation by means of the 
 % Direct Linear Transformation (DLT), by group 7.
 
 % Step 1: normalize.
@@ -36,7 +36,7 @@ end
 
 
 % Normalized DLT algorithm: from Lecture 2, page 54/60
-function [newp, T] = Normalise2DPts(p)
+function [p2, T] = Normalise2DPts(p)
     % This normalizing transformation will diminish the effect of the arbitrary
     % selection of origin and scale in the coordinate frame of the image, and
     % will mean that the combined algorithm is invariant to a similarity
@@ -56,14 +56,14 @@ function [newp, T] = Normalise2DPts(p)
     p(3,:) = 1;
     
     c = mean(p(1:2,:)')';
-    newp(1,:) = p(1,:)-c(1);
-    newp(2,:) = p(2,:)-c(2);
+    p2(1,:) = p(1,:)-c(1);
+    p2(2,:) = p(2,:)-c(2);
     
-    scale = sqrt(2)/mean(sqrt(newp(1,:).^2 + newp(2,:).^2));
+    scale = sqrt(2)/mean(sqrt(p2(1,:).^2 + p2(2,:).^2));
     
     T = [scale   0   -scale*c(1)
          0     scale -scale*c(2)
          0       0      1      ];
     
-    newp = T*p;
+    p2 = T*p;
 end
