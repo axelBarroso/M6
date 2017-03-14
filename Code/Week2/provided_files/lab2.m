@@ -11,9 +11,9 @@ imargb = imread('Data/llanes/llanes_a.jpg');
 imbrgb = imread('Data/llanes/llanes_b.jpg');
 imcrgb = imread('Data/llanes/llanes_c.jpg');
 
-imargb = imread('Data/castle_int/0016_s.png');
-imbrgb = imread('Data/castle_int/0015_s.png');
-imcrgb = imread('Data/castle_int/0014_s.png');
+%imargb = imread('Data/castle_int/0016_s.png');
+%imbrgb = imread('Data/castle_int/0015_s.png');
+%imcrgb = imread('Data/castle_int/0014_s.png');
 
 %imargb = imread('Data/aerial/site13/frame00000.png');
 %imbrgb = imread('Data/aerial/site13/frame00002.png');
@@ -87,15 +87,18 @@ plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), ...
 
 vgg_gui_H(imbrgb, imcrgb, Hbc);
 
+%% Compute homography (normalized DLT) between c and b, play with the homography
+
+% between c and b
+matches_cb = siftmatch(desc_c, desc_b);
+
+xcb_c = [points_c(1:2, matches_cb(1,:)); ones(1, length(matches_cb))];
+xcb_b = [points_b(1:2, matches_cb(2,:)); ones(1, length(matches_cb))];
+[Hcb, inliers_cb] = ransac_homography_adaptive_loop(xcb_c, xcb_b, th, 1000);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Build the mosaic
 
-% between a and b
-matches_cb = siftmatch(desc_c, desc_b);
-xcb_c = [points_c(1:2, matches_cb(1,:)); ones(1, length(matches_cb))];
-xcb_b = [points_b(1:2, matches_cb(2,:)); ones(1, length(matches_cb))];
-[Hcb, inliers_cb] = ransac_homography_adaptive_loop(xcb_c, xcb_b, th, 1000);
 corners = [-400 1200 -100 650];
 diagonal_mat = [1 0 0; 0 1 0; 0 0 1];
 
