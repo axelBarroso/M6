@@ -60,6 +60,9 @@ matches_bc = siftmatch(desc_b, desc_c);
 figure;
 plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), matches_bc, 'Stacking', 'v');
 
+% between c and b
+matches_cb = siftmatch(desc_c, desc_b);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Compute the homography (DLT algorithm) between image pairs
 
@@ -88,13 +91,10 @@ plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), ...
 vgg_gui_H(imbrgb, imcrgb, Hbc);
 
 %% Compute homography (normalized DLT) between c and b, play with the homography
-
-% between c and b
-matches_cb = siftmatch(desc_c, desc_b);
-
 xcb_c = [points_c(1:2, matches_cb(1,:)); ones(1, length(matches_cb))];
 xcb_b = [points_b(1:2, matches_cb(2,:)); ones(1, length(matches_cb))];
 [Hcb, inliers_cb] = ransac_homography_adaptive_loop(xcb_c, xcb_b, th, 1000);
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Build the mosaic
