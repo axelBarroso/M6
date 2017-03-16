@@ -1,19 +1,21 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 2: Image mosaics
 
+clear all; clc; close all;
+
 addpath('sift');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Compute image correspondences
 
 %% Open images
-imargb = imread('Data/llanes/llanes_a.jpg');
-imbrgb = imread('Data/llanes/llanes_b.jpg');
-imcrgb = imread('Data/llanes/llanes_c.jpg');
+% imargb = imread('Data/llanes/llanes_a.jpg');
+% imbrgb = imread('Data/llanes/llanes_b.jpg');
+% imcrgb = imread('Data/llanes/llanes_c.jpg');
 
-%imargb = imread('Data/castle_int/0016_s.png');
-%imbrgb = imread('Data/castle_int/0015_s.png');
-%imcrgb = imread('Data/castle_int/0014_s.png');
+imargb = imread('Data/castle_int/0016_s.png');
+imbrgb = imread('Data/castle_int/0015_s.png');
+imcrgb = imread('Data/castle_int/0014_s.png');
 
 %imargb = imread('Data/aerial/site13/frame00000.png');
 %imbrgb = imread('Data/aerial/site13/frame00002.png');
@@ -80,30 +82,23 @@ vgg_gui_H(imargb, imbrgb, Hab);
 
 
 %% Compute homography (normalized DLT) between b and c, play with the homography
-xbc_b = [points_b(1:2, matches_bc(1,:)); ones(1, length(matches_bc))];
-xbc_c = [points_c(1:2, matches_bc(2,:)); ones(1, length(matches_bc))];
-[Hbc, inliers_bc] = ransac_homography_adaptive_loop(xbc_b, xbc_c, th, 1000); 
-
-figure;
-plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), ...
-    matches_bc(:,inliers_bc), 'Stacking', 'v');
-
-vgg_gui_H(imbrgb, imcrgb, Hbc);
-
-%% Compute homography (normalized DLT) between c and b, play with the homography
 xcb_c = [points_c(1:2, matches_cb(1,:)); ones(1, length(matches_cb))];
 xcb_b = [points_b(1:2, matches_cb(2,:)); ones(1, length(matches_cb))];
 [Hcb, inliers_cb] = ransac_homography_adaptive_loop(xcb_c, xcb_b, th, 1000);
 
+figure;
+plotmatches(imc, imb, points_c(1:2,:), points_b(1:2,:), ...
+    matches_cb(:,inliers_cb), 'Stacking', 'v');
 
+vgg_gui_H(imbrgb, imcrgb, Hcb);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Build the mosaic
 
 corners = [-400 1200 -100 650];
-diagonal_mat = [1 0 0; 0 1 0; 0 0 1];
+I = [1 0 0; 0 1 0; 0 0 1];
 
 % b is the image in the middle
-iwb = apply_H_v2(imbrgb, diagonal_mat, corners);   % ToDo: complete the call to the function
+iwb = apply_H_v2(imbrgb, I, corners);   % ToDo: complete the call to the function
 % a to b
 iwa = apply_H_v2(imargb, Hab, corners);    % ToDo: complete the call to the function
 % c to b
@@ -111,7 +106,7 @@ iwc = apply_H_v2(imcrgb, Hcb, corners);    % ToDo: complete the call to the func
 
 figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
-title('Mosaic A-B-C');
+title('Mosaic A-B-C by normalized DLT');
 
 % ToDo: compute the mosaic with castle_int images
 % ToDo: compute the mosaic with aerial images set 13
@@ -122,13 +117,16 @@ title('Mosaic A-B-C');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Refine the homography with the Gold Standard algorithm
 % Homography ab
-x = ...;  %ToDo: set the non-homogeneous point coordinates of the 
-xp = ...; %      point correspondences we will refine with the geometric method
+x = xab_a(1:2, inliers_ab);  %ToDo: set the non-homogeneous point coordinates of the 
+xp = xab_b(1:2, inliers_ab); % point correspondences we will refine with the geometric method
+
 Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
 P0 = [ Hab(:) ; x(:) ];      % The parameters or independent variables
+
 Y_initial = gs_errfunction( P0, Xobs ); % ToDo: create this function that we need to pass to the lsqnonlin function
 % NOTE: gs_errfunction should return E(X) and not the sum-of-squares E=sum(E(X).^2)) that we want to minimize. 
 % (E(X) is summed and squared implicitly in the lsqnonlin algorithm.) 
+
 err_initial = sum( sum( Y_initial.^2 ));
 options = optimset('Algorithm', 'levenberg-marquardt');
 P = lsqnonlin(@(t) gs_errfunction(t, Xobs), P0, [], [], options);
@@ -140,6 +138,14 @@ fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err
 %% See differences in the keypoint locations
 % ToDo: compute the points xhat and xhatp which are the correspondences
 % returned by the refinement with the Gold Standard algorithm
+xhat = P(10:end);
+xhat = reshape(xhat,2,[]);
+one = ones(1,size(xhat,2));
+xhathomog = [xhat; one];
+
+xhatp = Hab_r*xhathomog;
+xhatp = xhatp ./ repmat(xhatp(end,:), size(xhatp,1), 1);
+
 figure;
 imshow(imargb);%image(imargb);
 hold on;
@@ -152,9 +158,35 @@ plot(xp(1,:), xp(2,:),'+y');
 plot(xhatp(1,:), xhatp(2,:),'+c');
 %%  Homography bc
 % ToDo: refine the homography bc with the Gold Standard algorithm
+x = xcb_c(1:2, inliers_cb);  %ToDo: set the non-homogeneous point coordinates of the 
+xp = xcb_b(1:2, inliers_cb); % point correspondences we will refine with the geometric method
+
+Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
+P0 = [ Hcb(:) ; x(:) ];      % The parameters or independent variables
+
+Y_initial = gs_errfunction( P0, Xobs ); % ToDo: create this function that we need to pass to the lsqnonlin function
+% NOTE: gs_errfunction should return E(X) and not the sum-of-squares E=sum(E(X).^2)) that we want to minimize. 
+% (E(X) is summed and squared implicitly in the lsqnonlin algorithm.) 
+
+err_initial = sum( sum( Y_initial.^2 ));
+options = optimset('Algorithm', 'levenberg-marquardt');
+P = lsqnonlin(@(t) gs_errfunction(t, Xobs), P0, [], [], options);
+Hcb_r = reshape( P(1:9), 3, 3 );
+f = gs_errfunction( P, Xobs ); % lsqnonlin does not return f
+err_final = sum( sum( f.^2 ));
+% we show the geometric error before and after the refinement
+fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err_final);
 %% See differences in the keypoint locations
 % ToDo: compute the points xhat and xhatp which are the correspondences
 % returned by the refinement with the Gold Standard algorithm
+xhat = P(10:end);
+xhat = reshape(xhat,2,[]);
+one = ones(1,size(xhat,2));
+xhathomog = [xhat; one];
+
+xhatp = Hcb_r*xhathomog;
+xhatp = xhatp ./ repmat(xhatp(end,:), size(xhatp,1), 1);
+
 figure;
 imshow(imbrgb);%image(imbrgb);
 hold on;
@@ -167,14 +199,17 @@ plot(xp(1,:), xp(2,:),'+y');
 plot(xhatp(1,:), xhatp(2,:),'+c');
 %% Build mosaic
 corners = [-400 1200 -100 650];
-iwb = apply_H_v2(imbrgb, ??, corners); % ToDo: complete the call to the function
-iwa = apply_H_v2(imargb, ??, corners); % ToDo: complete the call to the function
-iwc = apply_H_v2(imcrgb, ??, corners); % ToDo: complete the call to the function
+iwb = apply_H_v2(imbrgb, I, corners); % ToDo: complete the call to the function
+iwa = apply_H_v2(imargb, Hab_r, corners); % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, Hcb_r, corners); % ToDo: complete the call to the function
 figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
-title('Mosaic A-B-C');
+title('Mosaic A-B-C by Gold Standard algorithm');
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. OPTIONAL: Calibration with a planar pattern
+%{
 clear all;
 %% Read template and images.
 T     = imread('Data/calib/template.jpg');

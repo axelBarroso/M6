@@ -17,21 +17,20 @@ function H = homography2d(x,xp)
 xp_x = xp(1,:);
 xp_y = xp(2,:);
 xp_w = xp(3,:);
-a = [];
+A = [];
 % Computing homographies: from Lecture 2, page 42/60
 for i=1:size(x,2)
-    a = [a; zeros(3,1)'     -xp_w(i)*x(:,i)'   xp_y(i)*x(:,i)'; ...
+    A = [A; zeros(3,1)'     -xp_w(i)*x(:,i)'   xp_y(i)*x(:,i)'; ...
             xp_w(i)*x(:,i)'   zeros(3,1)'     -xp_x(i)*x(:,i)'];
 end
 
 % Step 3: compute the SVD of A. The unit singular vector corresponding to the
 % smallest singular value is the solution h. A = UDV' Then h is the last column of V.
-[~,~,v] = svd(a);
+[~,~,v] = svd(A);
 h = reshape(v(:,9),3,3)';
 
 % Step 4: Desnormalization
 H = inv(t2) * h * t1;
-
 end
 
 
