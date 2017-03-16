@@ -107,7 +107,7 @@ iwb = apply_H_v2(imbrgb, diagonal_mat, corners);   % ToDo: complete the call to 
 % a to b
 iwa = apply_H_v2(imargb, Hab, corners);    % ToDo: complete the call to the function
 % c to b
-iwc = apply_H_v2(imcrgb, Hbc, corners);    % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, Hcb, corners);    % ToDo: complete the call to the function
 
 figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
@@ -121,7 +121,6 @@ title('Mosaic A-B-C');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Refine the homography with the Gold Standard algorithm
-%{
 % Homography ab
 x = ...;  %ToDo: set the non-homogeneous point coordinates of the 
 xp = ...; %      point correspondences we will refine with the geometric method
@@ -210,14 +209,20 @@ for i = 1:N
     % Fit homography and remove outliers.
     x1 = pointsT(1:2, matches(1, :));
     x2 = points{i}(1:2, matches(2, :));
+    
+    % Convert to homog. coords
+    x1_h = [x1; ones(1, size(x1,2))];
+    x2_h = [x2; ones(1, size(x2,2))];
+
     H{i} = 0;
-    [H{i}, inliers] =  ransac_homography_adaptive_loop(homog(x1), homog(x2), 3, 1000);
+    [H{i}, inliers] =  ransac_homography_adaptive_loop(x1_h, x2_h, 3, 1000);
     % Plot inliers.
     figure;
     plotmatches(Tg, Ig{i}, pointsT(1:2,:), points{i}(1:2,:), matches(:, inliers));
     % Play with the homography
-    %vgg_gui_H(T, I{i}, H{i});
+    vgg_gui_H(T, I{i}, H{i});
 end
+%{
 %% Compute the Image of the Absolute Conic
 w = ... % ToDo
  
