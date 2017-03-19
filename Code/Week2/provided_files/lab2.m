@@ -209,8 +209,9 @@ title('Mosaic A-B-C by Gold Standard algorithm');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. OPTIONAL: Calibration with a planar pattern
-%{
-clear all;
+
+clear all; close all;
+
 %% Read template and images.
 T     = imread('Data/calib/template.jpg');
 I{1}  = imread('Data/calib/graffiti1.tif');
@@ -223,6 +224,7 @@ Ig{1} = sum(double(I{1}), 3) / 3 / 255;
 Ig{2} = sum(double(I{2}), 3) / 3 / 255;
 Ig{3} = sum(double(I{3}), 3) / 3 / 255;
 N = length(I);
+
 %% Compute keypoints.
 fprintf('Computing sift points in template... ');
 [pointsT, descrT] = sift(Tg, 'Threshold', 0.05);
@@ -257,25 +259,72 @@ for i = 1:N
     % Play with the homography
     vgg_gui_H(T, I{i}, H{i});
 end
-%{
+
 %% Compute the Image of the Absolute Conic
-w = ... % ToDo
- 
-%% Recover the camera calibration.
-K = ... % ToDo
+% Image of the Absolute Conic, which is usually written as w. 
+% For computational pruposes, it will be simpler to first find w
+% and then recover the camera matrix K from it.
+% We know that hi'*w*hj = Vij'*x. vij'*x = 0 and (vii'-vjj')*x = 0
+
+v = [];
+for n=1:N
+
+    H_i = H{n};
     
-% ToDo: in the report make some comments related to the obtained internal
-%       camera parameters and also comment their relation to the image size
+    i = 1; 
+    j = 2;
+    v12_T = [H_i(1,i)*H_i(1,j), H_i(1,i)*H_i(2,j) + H_i(2,i)*H_i(1,j), ...
+        H_i(1,i)*H_i(3,j) + H_i(3,i)*H_i(1,j), H_i(2,i)*H_i(2,j), ...
+        H_i(2,i)*H_i(3,j) + H_i(3,i)*H_i(2,j), H_i(3,i)*H_i(3,j)];
+            
+    i = 1; 
+    j = 1;
+    v11_T = [H_i(1,i)*H_i(1,j), H_i(1,i)*H_i(2,j) + H_i(2,i)*H_i(1,j), ...
+        H_i(1,i)*H_i(3,j) + H_i(3,i)*H_i(1,j), H_i(2,i)*H_i(2,j), ...
+        H_i(2,i)*H_i(3,j) + H_i(3,i)*H_i(2,j), H_i(3,i)*H_i(3,j)];
+        
+    i = 2; 
+    j = 2;
+    v22_T = [H_i(1,i)*H_i(1,j), H_i(1,i)*H_i(2,j) + H_i(2,i)*H_i(1,j), ...
+        H_i(1,i)*H_i(3,j) + H_i(3,i)*H_i(1,j), H_i(2,i)*H_i(2,j), ...
+        H_i(2,i)*H_i(3,j) + H_i(3,i)*H_i(2,j), H_i(3,i)*H_i(3,j)];
+    
+    v1 = v12_T;
+    v2 = v11_T - v22_T;
+    
+    v = [v;v1;v2];  
+end
+
+[~, ~, V] = svd(v);
+
+omega = V(:,end);
+
+w = [omega(1), omega(2), omega(3); 
+     omega(2), omega(4), omega(5); 
+     omega(3), omega(5), omega(6)]; % ToDo
+
+%% Recover the camera calibration.
+ K = chol(inv(w),'upper');
+ 
+%%
+        % ToDo: in the report make some comments related to the obtained internal
+        %       camera parameters and also comment their relation to the image size
+        
+        % Add comments 
+
 %% Compute camera position and orientation.
 R = cell(N,1);
 t = cell(N,1);
 P = cell(N,1);
 figure;hold;
 for i = 1:N
+    
+    H_i = H{n};
+    
     % ToDo: compute r1, r2, and t{i}
-    r1 = ...
-    r2 = ...
-    t{i} = ...
+    r1 = inv(K) * H_i(:,1) / norm(inv(K) * H_i(:,1));
+    r2 = inv(K) * H_i(:,2) / norm(inv(K) * H_i(:,2));
+    t{i} = inv(K) * H_i(:,3) / norm(inv(K) * H_i(:,1));
     
     % Solve the scale ambiguity by forcing r1 and r2 to be unit vectors.
     s = sqrt(norm(r1) * norm(r2)) * sign(t{i}(3));
@@ -291,8 +340,13 @@ for i = 1:N
     P{i} = K * [R{i} t{i}];
     plot_camera(P{i}, 800, 600, 200);
 end
-% ToDo: in the report explain how the optical center is computed in the
-%       provided code
+%%
+        % ToDo: in the report explain how the optical center is computed in the
+        %       provided code
+
+        % Add comments 
+
+%%
 [ny,nx] = size(T);
 p1 = [0 0 0]';
 p2 = [nx 0 0]';
@@ -304,26 +358,74 @@ vgg_scatter_plot([p1 p2 p3 p4 p1], 'g');
 surface('XData',[0 nx; 0 nx],'YData',[0 0; 0 0],'ZData',[0 0; -ny -ny],'CData',T,'FaceColor','texturemap');
 colormap(gray);
 axis equal;
+
 %% Plot a static camera with moving calibration pattern.
 figure; hold;
 plot_camera(K * eye(3,4), 800, 600, 200);
+
 % ToDo: complete the call to the following function with the proper
 %       coordinates of the image corners in the new reference system
-for i = 1:N
-    vgg_scatter_plot( [...   ...   ...   ...   ...], 'r');
+corners = [p1 p2 p3 p4];
+corners(end+1, : ) = 1;
+for i = 1:N  
+    calibrationPoints = P{i} * corners;
+    vgg_scatter_plot(calibrationPoints, 'r');
 end
+
 %% Augmented reality: Plot some 3D points on every camera.
 [Th, Tw] = size(Tg);
 cube = [0 0 0; 1 0 0; 1 0 0; 1 1 0; 1 1 0; 0 1 0; 0 1 0; 0 0 0; 0 0 1; 1 0 1; 1 0 1; 1 1 1; 1 1 1; 0 1 1; 0 1 1; 0 0 1; 0 0 0; 1 0 0; 1 0 0; 1 0 1; 1 0 1; 0 0 1; 0 0 1; 0 0 0; 0 1 0; 1 1 0; 1 1 0; 1 1 1; 1 1 1; 0 1 1; 0 1 1; 0 1 0; 0 0 0; 0 1 0; 0 1 0; 0 1 1; 0 1 1; 0 0 1; 0 0 1; 0 0 0; 1 0 0; 1 1 0; 1 1 0; 1 1 1; 1 1 1; 1 0 1; 1 0 1; 1 0 0 ]';
 X = (cube - .5) * Tw / 4 + repmat([Tw / 2; Th / 2; -Tw / 8], 1, length(cube));
+X(end+1,:) = 1;
 for i = 1:N
     figure; colormap(gray);
     imagesc(Ig{i});
     hold on;
-    x = euclid(P{i} * homog(X));
+    x = euclid(P{i} * X);
     vgg_scatter_plot(x, 'g');
 end
+
 % ToDo: change the virtual object, use another 3D simple geometric object like a pyramid
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. OPTIONAL: Add a logo to an image using the DLT algorithm
-%}
+clear all; close all; clc;
+imargb = imread('Data/logo/timesSquare.jpg');
+imbrgb = imread('Data/logo/bw.jpg');
+
+ima = sum(double(imargb), 3) / 3 / 255;
+imb = sum(double(imbrgb), 3) / 3 / 255;
+
+% Points image 1
+p1 = [1488 384 1]';
+p2 = [1957 267 1]';
+p3 = [1972 832 1]';
+p4 = [1500 844 1]';
+x1 = [p1 p2 p3 p4];
+
+% Points image 2
+[ny,nx] = size(imb);
+p1 = [0 0 1]';
+p2 = [nx 0 1]';
+p3 = [nx ny 1]';
+p4 = [0 ny 1]';
+x2 = [p1 p2 p3 p4];
+
+H = homography2d(x2, x1);
+
+[ny,nx] = size(ima);
+corners = [0 nx 0 ny];
+I = [1 0 0; 0 1 0; 0 0 1];
+
+% a is the image in the middle
+iwa = apply_H_v2(imargb, I, corners);   % ToDo: complete the call to the function
+% b to a
+iwb = apply_H_v2(imbrgb, H, corners);    % ToDo: complete the call to the function
+
+e = find(iwb);
+iwa(e) = 0;
+
+figure;
+imshow(max(iwb, iwa));
+title('Added image into another image by normalized DLT');
