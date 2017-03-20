@@ -386,6 +386,25 @@ for i = 1:N
 end
 
 % ToDo: change the virtual object, use another 3D simple geometric object like a pyramid
+[Th, Tw] = size(Tg);
+x = [ 0 1 1 1 1 0 0 0 sqrt(2)/2 1 sqrt(2)/2 0 sqrt(2)/2 1 sqrt(2)/2];
+y = [ 0 0 0 0 0 0 0 0 -1 0 -1 0 -1 0 -1]; 
+z = [ 0 0 0 1 1 1 1 0 sqrt(2)/2 0 sqrt(2)/2 1 sqrt(2)/2 1 sqrt(2)/2];
+pyramid = [];
+for i = 1:size(x,2)
+    pyramid = [pyramid; [x(i) y(i) z(i)]];
+end
+pyramid = pyramid';
+X = (pyramid - repmat([.5; 0; .5], 1, size(pyramid, 2))) * Tw/4 + ...
+    repmat([Tw/2; Th/2; -Tw/8], 1, size(pyramid, 2));
+X(end+1,:) = 1;
+for i = 1:N
+    figure; colormap(gray);
+    imagesc(Ig{i});
+    hold on;
+    x = euclid(P{i} * X);
+    vgg_scatter_plot(x, 'r');
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
