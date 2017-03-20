@@ -390,13 +390,22 @@ end
 x = [ 0 1 1 1 1 0 0 0 sqrt(2)/2 1 sqrt(2)/2 0 sqrt(2)/2 1 sqrt(2)/2];
 y = [ 0 0 0 0 0 0 0 0 -1 0 -1 0 -1 0 -1]; 
 z = [ 0 0 0 1 1 1 1 0 sqrt(2)/2 0 sqrt(2)/2 1 sqrt(2)/2 1 sqrt(2)/2];
+
 pyramid = [];
 for i = 1:size(x,2)
     pyramid = [pyramid; [x(i) y(i) z(i)]];
 end
+
+theta = degtorad(-90);
+Rx_theta = [1 0 0; 0 cos(theta) -sin(theta); 0 sin(theta) cos(theta)];
+%Ry_theta = [cos(theta) 0 sin(theta); 0 1 0; -sin(theta) 0 cos(theta)];
+%Rz_theta = [cos(theta) -sin(theta) 0; sin(theta) cos(theta) 0; 0 0 1];
+
+pyramid = pyramid*Rx_theta;
+
 pyramid = pyramid';
-X = (pyramid - repmat([.5; 0; .5], 1, size(pyramid, 2))) * Tw/4 + ...
-    repmat([Tw/2; Th/2; -Tw/8], 1, size(pyramid, 2));
+X = (pyramid - repmat([.5; 0; .5], 1, size(pyramid,2))) * Tw / 4 + ...
+    repmat([Tw / 2; Th / 2; -Tw / 8], 1, size(pyramid,2));
 X(end+1,:) = 1;
 for i = 1:N
     figure; colormap(gray);
