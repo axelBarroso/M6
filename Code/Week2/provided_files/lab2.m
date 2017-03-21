@@ -319,7 +319,7 @@ P = cell(N,1);
 figure;hold;
 for i = 1:N
     
-    H_i = H{n};
+    H_i = H{i};
     
     % ToDo: compute r1, r2, and t{i}
     r1 = inv(K) * H_i(:,1) / norm(inv(K) * H_i(:,1));
@@ -365,10 +365,10 @@ plot_camera(K * eye(3,4), 800, 600, 200);
 
 % ToDo: complete the call to the following function with the proper
 %       coordinates of the image corners in the new reference system
-corners = [p1 p2 p3 p4];
+corners = [p1 p2 p3 p4 p1];
 corners(end+1, : ) = 1;
 for i = 1:N  
-    calibrationPoints = P{i} * corners;
+    calibrationPoints = inv(K) * (P{i} * corners);
     vgg_scatter_plot(calibrationPoints, 'r');
 end
 
