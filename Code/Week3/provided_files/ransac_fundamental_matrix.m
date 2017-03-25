@@ -39,21 +39,34 @@ end
 
 
 function idx_inliers = compute_inliers(F, p1, p2, th)
-    
-    error = [];
-    for i = 1 : size(p1, 2)
-        % Compute Sampson error 
-        error = [error compute_Sampson_error(F, p1, p2)];
-    end
-    
+    error = compute_Sampson_error(F, p1, p2)
     idx_inliers = find(error < th.^2);
 end
 
+
 function error = compute_Sampson_error(F, p1, p2)
 % Sampson error (1st order approx. of the geometric distance)
-
-
-
-
+% See page 3/13 of lab3
+    p2Fp1 = zeros(1, size(p1, 2));
+    
+    for i = 1 : size(p1, 2)
+        p2Fp1(i) = p2(:,i)'*F*p1(:,i);
+    end
+    
+    Fp1 = F*p1;
+	Fp2 = F'*p2;     
+	
+	% evaluate distances
+	error = p2Fp1.^2 ./ (Fp1(1,:).^2 + Fp1(2,:).^2 + Fp2(1,:).^2 + Fp2(2,:).^2);
 end
 
+function item = randomsample(npts, n)
+	a = [1:npts]; 
+    item = zeros(1,n);    
+    for i = 1:n
+	  % Generate random value in the appropriate range 
+	  r = ceil((npts-i+1).*rand);
+	  item(i) = a(r);       % Select the rth element from the list
+	  a(r)    = a(end-i+1); % Overwrite selected element
+    end                       % ... and repeat
+end
