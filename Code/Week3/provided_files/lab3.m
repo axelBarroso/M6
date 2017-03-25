@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 %% Lab 3: The geometry of two views 
 % (optional: photo-sequencing)
 
@@ -75,15 +75,15 @@ vgg_gui_F(im1rgb, im2rgb, F');
 
 %% Plot some epipolar lines
 
-number_of_inliers=3;
-points=inliers(randsample(size(inliers,2),number_of_inliers));
+number_of_inliers = 3;
+points = inliers(randsample(size(inliers,2), number_of_inliers));
 
 % choose three random indices
 m1 = points(1);
 m2 = points(2);
 m3 = points(3);
 
-% Lo he visto en las diapos l=FT·p’ diapo 38 (última clase)
+% Lo he visto en las diapos l=FTÂ·pâ€™ diapo 38 (Ãºltima clase)
 ip1 = p1(:,points);  %pick coordinates of the inliers points
 ip2 = p2(:,points);     
 l1 = F'*ip2; % epipolar lines in image 2
