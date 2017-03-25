@@ -75,44 +75,45 @@ vgg_gui_F(im1rgb, im2rgb, F');
 
 %% Plot some epipolar lines
 
-% Lo he visto en las diapos l=FT·p’ diapo 38 (última clase)
 number_of_inliers=3;
 points=inliers(randsample(size(inliers,2),number_of_inliers));
-ip1 = p1(:,points);
-ip2 = p2(:,points);
-l1 = F'*ip2; % epipolar lines in image 2
-l2 = F*ip1;% epipolar lines in image 1 % ToDo
 
 % choose three random indices
 m1 = points(1);
 m2 = points(2);
 m3 = points(3);
 
+% Lo he visto en las diapos l=FT·p’ diapo 38 (última clase)
+ip1 = p1(:,points);  %pick coordinates of the inliers points
+ip2 = p2(:,points);     
+l1 = F'*ip2; % epipolar lines in image 2
+l2 = F*ip1;% epipolar lines in image 1 % ToDo
+
 % image 1 (plot the three points and their corresponding epipolar lines)
 figure;
 imshow(im1rgb);
 hold on;
 plot(p1(1, m1), p1(2, m1), '+g');
-plot_homog_line(l1(:, 1));
+plot_homog_line(l1(:, 1)); %indices of the points m1,m2,m3
 
 plot(p1(1, m2), p1(2, m2), '+g');
-plot_homog_line(l1(:, 2));
+plot_homog_line(l1(:, 2)); %indices of the points m1,m2,m3
 
 plot(p1(1, m3), p1(2, m3), '+g');
-plot_homog_line(l1(:, 3));
+plot_homog_line(l1(:, 3)); %indices of the points m1,m2,m3
 
 % image 2 (plot the three points and their corresponding epipolar lines)
 figure;
 imshow(im2rgb);
 hold on;
 plot(p2(1, m1), p2(2, m1), '+g');
-plot_homog_line(l2(:, 1));
+plot_homog_line(l2(:, 1)); %indices of the points m1,m2,m3
 
 plot(p2(1, m2), p2(2, m2), '+g');
-plot_homog_line(l2(:, 2));
+plot_homog_line(l2(:, 2)); %indices of the points m1,m2,m3
 
 plot(p2(1, m3), p2(2, m3), '+g');
-plot_homog_line(l2(:, 3));
+plot_homog_line(l2(:, 3)); %indices of the points m1,m2,m3
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
