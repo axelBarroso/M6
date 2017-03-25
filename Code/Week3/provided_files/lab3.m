@@ -23,12 +23,13 @@ x2_test = P2 * X;
 F_es = fundamental_matrix(x1_test, x2_test);
 
 % Real fundamental matrix
-F_gt = ... % ToDo: write the expression of the real fundamental matrix for P1 and P2
+% F=K2'^-1[t]RK1^-1. In our case, K1 = K2 = I beacuse P1 = I and P2 = [R t];
+Tx = [0 -t(3) t(2); t(3) 0  -t(1); -t(2) t(1) 0];
+F_gt = Tx * R; % ToDo: write the expression of the real fundamental matrix for P1 and P2
 
 % Evaluation: these two matrices should be very similar
 F_gt / norm(F_gt)
 F_es / norm(F_es)
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Robustly fit fundamental matrix
@@ -73,6 +74,8 @@ vgg_gui_F(im1rgb, im2rgb, F');
 
 
 %% Plot some epipolar lines
+
+% Lo he visto en las diapos l=FT·p’ diapo 38 (última clase)
 
 l2 = ... % epipolar lines in image 2 % ToDo
 l1 = ... % epipolar lines in image 1 % ToDo
