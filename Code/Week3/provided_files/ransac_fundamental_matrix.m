@@ -39,7 +39,7 @@ end
 
 
 function idx_inliers = compute_inliers(F, p1, p2, th)
-    error = compute_Sampson_error(F, p1, p2)
+    error = compute_Sampson_error(F, p1, p2);
     idx_inliers = find(error < th.^2);
 end
 
