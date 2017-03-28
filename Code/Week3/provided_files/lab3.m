@@ -74,7 +74,6 @@ vgg_gui_F(im1rgb, im2rgb, F');
 
 
 %% Plot some epipolar lines
-
 number_of_inliers = 3;
 points = inliers(randsample(size(inliers,2), number_of_inliers));
 
