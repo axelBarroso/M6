@@ -3,7 +3,7 @@
 % (optional: photo-sequencing)
 
 addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
-
+clear all; close all; clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Compute the fundamental matrix
 
@@ -83,7 +83,6 @@ m1 = points(1);
 m2 = points(2);
 m3 = points(3);
 
-% Lo he visto en las diapos l=FT·p’ diapo 38 (última clase)
 ip1 = p1(:,points);  %pick coordinates of the inliers points
 ip2 = p2(:,points);     
 l1 = F'*ip2; % epipolar lines in image 2
@@ -239,7 +238,6 @@ plot(t, -(l4(1)*t + l4(3)) / l4(2), 'g');
 % ToDo: compute the projection of point idx_car_I4 in the reference image
 pi4 = cross(l1, l4); %
 plot(pi4(1)/pi4(3), pi4(2)/pi4(3), 'g*');
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Photo-sequencing with your own images
