@@ -141,8 +141,8 @@ for i = 1 : 4
     X = triangulate(x1_match, x2_match, P1, P2, [w h]);
     x1_trian = euclid(P1*X);
     x2_trian = euclid(P2*X);
-    error1 = abs(x1_trian - x1_match);
-    error2 = abs(x2_trian - x2_match);
+    error1 = abs(x1_trian - x1_match)
+    error2 = abs(x2_trian - x2_match)
     d = [error1 error2];
     meanError = mean(mean(d));
     if th > mean(mean(d))
@@ -151,14 +151,14 @@ for i = 1 : 4
     end
 end
 P2 = Pc2{P2_best};
-plot_camera(P2,w,h, 'g');
-
+plot_camera(Pc2{1},w,h, 'g');
 % Triangulate all matches.
 N = size(x1,2);
 X = zeros(4,N);
 for i = 1:N
     X(:,i) = triangulate(x1(:,i), x2(:,i), P1, P2, [w h]);
 end
+
 
 
 %% Plot with colors
