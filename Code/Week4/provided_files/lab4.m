@@ -1,7 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 4: Reconstruction from two views (knowing internal camera parameters) 
 % (optional: depth computation)
-
+clear all
+clc
 addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -167,8 +168,8 @@ g = interp2(double(Irgb{1}(:,:,2)), x1(1,:), x1(2,:));
 b = interp2(double(Irgb{1}(:,:,3)), x1(1,:), x1(2,:));
 Xe = euclid(X);
 figure; hold on;
-plot_camera(P1,w,h);
-plot_camera(P2,w,h);
+plot_camera(P1,w,h,'b');
+plot_camera(P2,w,h,'b');
 for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(3,i), -Xe(2,i), 5^2, [r(i) g(i) b(i)]/255, 'filled');
 end;
@@ -180,6 +181,16 @@ axis equal;
 % ToDo: compute the reprojection errors
 %       plot the histogram of reprojection errors, and
 %       plot the mean reprojection error
+x11=euclid(P1*X);
+x22=euclid(P2*X);
+RPerror = (( x1(1,:) - x11(1,:)).^2) + (( x1(2,:) - x11(2,:)).^2) + (( x2(1,:) - x22(1,:)).^2) + (( x2(2,:) - x22(2,:)).^2);
+figure;
+histogram(RPerror, 'BinLimits',[-1,15]);
+for i=1:length(RPerror)
+    if RPerror(i)>15
+        disp(['As we have cropped the histogram for visualizing purpose, this value does not appear ' , num2str(RPerror(i))]);
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Depth map computation with local methods (SSD)
