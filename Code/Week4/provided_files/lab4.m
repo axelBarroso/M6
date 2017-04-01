@@ -1,9 +1,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 4: Reconstruction from two views (knowing internal camera parameters) 
 % (optional: depth computation)
-clear all
-clc
+
 addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+clear all; close all; clc; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Triangulation
@@ -38,7 +38,6 @@ end
 
 % error
 euclid(X_test) - euclid(X_trian)
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Reconstruction from two views
@@ -135,19 +134,13 @@ plot_camera(Pc2{4},w,h, 'b');
 %Select a match point. 
 x1_match = x1_test(:,1);
 x2_match = x2_test(:,1);
-th = 1000000;
 P2_best = 1;
 for i = 1 : 4
     P2 = Pc2{i};
     X = triangulate(x1_match, x2_match, P1, P2, [w h]);
-    x1_trian = euclid(P1*X);
-    x2_trian = euclid(P2*X);
-    error1 = abs(x1_trian - x1_match);
-    error2 = abs(x2_trian - x2_match);
-    d = [error1 error2];
-    meanError = mean(mean(d));
-    if th > mean(mean(d))
-        th = meanError;
+    x1_trian = P1*X;
+    x2_trian = P2*X;
+    if (x1_trian(3) > 0) && (x2_trian(3) > 0)
         P2_best = i;
     end
 end
@@ -160,7 +153,6 @@ X = zeros(4,N);
 for i = 1:N
     X(:,i) = triangulate(x1(:,i), x2(:,i), P1, P2, [w h]);
 end
-
 
 %% Plot with colors
 r = interp2(double(Irgb{1}(:,:,1)), x1(1,:), x1(2,:));
@@ -187,9 +179,9 @@ RPerror = (( x1(1,:) - x11(1,:)).^2) + (( x1(2,:) - x11(2,:)).^2) + (( x2(1,:) -
 figure;
 histogram(RPerror, 'BinLimits',[-1,15]);
 for i=1:length(RPerror)
-    if RPerror(i)>15
-        disp(['As we have cropped the histogram for visualizing purpose, this value does not appear ' , num2str(RPerror(i))]);
-    end
+ if RPerror(i)>15
+     disp(['As we have cropped the histogram for visualizing purpose, this value does not appear ' , num2str(RPerror(i))]);
+ end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
