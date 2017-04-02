@@ -238,7 +238,7 @@ minimum_disparity = 0;
 maximum_disparity = 16;
 window_size = 9;
 
-[disparity_ncc] = sc(left_image, right_image, ... 
+[disparity_ncc] = stereo_computation(left_image, right_image, ... 
     minimum_disparity, maximum_disparity, window_size, 'ncc');
 
 figure;
