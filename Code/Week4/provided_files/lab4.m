@@ -211,17 +211,20 @@ end
 % Note 1: Use grayscale images
 % Note 2: Use 0 as minimum disparity and 16 as the the maximum one.
 
-left_image = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
-right_image = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
+
+left_image = rgb2gray(imread('Data/scene1.row3.col4.ppm'));
+right_image = rgb2gray(imread('Data/scene1.row3.col3.ppm'));
 minimum_disparity = 0;
 maximum_disparity = 16;
-window_size = 9;
+window_size = 30;
 
-[disparity_ssd] = stereo_computation(left_image, right_image, ... 
+[disparity_ssd] = stereo_computation(double(left_image), double(right_image), ... 
     minimum_disparity, maximum_disparity, window_size, 'ssd');
 
 figure;
 imshow(disparity_ssd,[]);
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Depth map computation with local methods (NCC)
@@ -232,13 +235,14 @@ imshow(disparity_ssd,[]);
 % Evaluate the results changing the window size (e.g. 3x3, 9x9, 20x20,
 % 30x30) and the matching cost. Comment the results.
 
-left_image = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
-right_image = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
+
+left_image = rgb2gray(imread('Data/scene1.row3.col4.ppm'));
+right_image = rgb2gray(imread('Data/scene1.row3.col3.ppm'));
 minimum_disparity = 0;
 maximum_disparity = 16;
-window_size = 9;
+window_size = 30;
 
-[disparity_ncc] = stereo_computation(left_image, right_image, ... 
+[disparity_ncc] = stereo_computation(double(left_image), double(right_image), ... 
     minimum_disparity, maximum_disparity, window_size, 'ncc');
 
 figure;
