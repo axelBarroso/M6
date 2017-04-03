@@ -63,15 +63,21 @@ function [ disparity_map ] = stereo_computation(left_image, right_image, minimum
                             end
                         
                         % Compute biweight cost
-                        else % strcmp(matching_cost, 'biweight')
+                        elseif strcmp(matching_cost, 'bilateral_weights')
                             
                             if isempty(best_cost) && isempty(disparity_map)
-                                disp('-- Computing biweight cost.')
+                                disp('-- Computing bilateral weight cost.')
                                 best_cost = 99999.0 * ones(size(left_image));
                                 disparity_map = zeros(size(left_image));
                             end
                             
-                            % TO DO
+                            cost = bilateral_weights_cost(w_im_1, w_im_2);
+                            
+                            % Look for the highest
+                            if cost > best_cost(r,c)
+                                best_cost(r,c) = cost;
+                                disparity_map(r,c) = curr_disp;
+                            end
                             
                         end
                         

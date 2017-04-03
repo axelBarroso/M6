@@ -132,8 +132,8 @@ plot_camera(Pc2{4},w,h, 'b');
 % ToDo: Choose a second camera candidate by triangulating a match.
 
 %Select a match point. 
-x1_match = x1_test(:,1);
-x2_match = x2_test(:,1);
+x1_match = x1(:,1);
+x2_match = x2(:,1);
 P2_best = 1;
 for i = 1 : 4
     P2 = Pc2{i};
@@ -144,6 +144,7 @@ for i = 1 : 4
         P2_best = i;
     end
 end
+
 P2 = Pc2{P2_best};
 plot_camera(P2,w,h, 'g');
 
@@ -222,7 +223,6 @@ window_size = 9;
 figure;
 imshow(disparity_ssd,[]);
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Depth map computation with local methods (NCC)
 
@@ -243,7 +243,6 @@ window_size = 9;
 
 figure;
 imshow(disparity_ncc,[]);
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Depth map computation with local methods
@@ -275,6 +274,19 @@ imshow(disparity,[]);
 %
 % Note: Use grayscale images (the paper uses color images)
 
+left_image = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
+right_image = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
+
+minimum_disparity = 0;
+maximum_disparity = 16;
+window_size = 35;
+
+[disparity_bil] = stereo_computation(left_image, right_image, ... 
+    minimum_disparity, maximum_disparity, window_size, 'bilateral_weights');
+
+figure;
+imshow(disparity_bil,[]);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL:  Stereo computation with Belief Propagation
 
@@ -288,5 +300,4 @@ imshow(disparity,[]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 8. OPTIONAL:  Depth computation with Plane Sweeping
-
 % Implement the plane sweeping method explained in class.
