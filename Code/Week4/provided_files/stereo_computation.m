@@ -5,7 +5,7 @@ function [ disparity_map ] = stereo_computation(left_image, right_image, minimum
             && size(left_image, 2) == size(right_image, 2)
 
         % Compute windows depending on window_size (check if even or odd)
-        if floor(window_size/2) == window_size/2
+        if (mod(window_size,2) == 0)
             wl = window_size/2; 
             wr = window_size/2-1;
         else
@@ -74,7 +74,7 @@ function [ disparity_map ] = stereo_computation(left_image, right_image, minimum
                             cost = bilateral_weights_cost(w_im_1, w_im_2);
                             
                             % Look for the highest
-                            if cost > best_cost(r,c)
+                            if cost < best_cost(r,c)
                                 best_cost(r,c) = cost;
                                 disparity_map(r,c) = curr_disp;
                             end

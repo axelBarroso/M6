@@ -49,7 +49,6 @@ I{1} = sum(double(Irgb{1}), 3) / 3 / 255;
 I{2} = sum(double(Irgb{2}), 3) / 3 / 255;
 [h,w] = size(I{1});
 
-
 %% Compute keypoints and matches.
 points = cell(2,1);
 descr = cell(2,1);
@@ -63,7 +62,6 @@ matches = siftmatch(descr{1}, descr{2});
 % Plot matches.
 figure();
 plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
-
 
 %% Fit Fundamental matrix and remove outliers.
 x1 = points{1}(:, matches(1, :));
@@ -224,8 +222,6 @@ window_size = 30;
 figure;
 imshow(disparity_ssd,[]);
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Depth map computation with local methods (NCC)
 
@@ -240,7 +236,7 @@ left_image = rgb2gray(imread('Data/scene1.row3.col4.ppm'));
 right_image = rgb2gray(imread('Data/scene1.row3.col3.ppm'));
 minimum_disparity = 0;
 maximum_disparity = 16;
-window_size = 30;
+window_size = 35;
 
 [disparity_ncc] = stereo_computation(double(left_image), double(right_image), ... 
     minimum_disparity, maximum_disparity, window_size, 'ncc');
@@ -266,7 +262,6 @@ window_size = 20;
     minimum_disparity, maximum_disparity, window_size, 'ssd');
 figure;
 imshow(disparity,[]);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. OPTIONAL: Bilateral weights
 
@@ -284,7 +279,6 @@ right_image = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
 minimum_disparity = 0;
 maximum_disparity = 16;
 window_size = 35;
-
 [disparity_bil] = stereo_computation(left_image, right_image, ... 
     minimum_disparity, maximum_disparity, window_size, 'bilateral_weights');
 
