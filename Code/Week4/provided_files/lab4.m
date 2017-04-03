@@ -210,8 +210,8 @@ end
 % Note 1: Use grayscale images
 % Note 2: Use 0 as minimum disparity and 16 as the the maximum one.
 
-left_image = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
-right_image = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
+left_image = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
+right_image = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
 minimum_disparity = 0;
 maximum_disparity = 16;
 window_size = 9;
@@ -232,8 +232,8 @@ imshow(disparity_ssd,[]);
 % Evaluate the results changing the window size (e.g. 3x3, 9x9, 20x20,
 % 30x30) and the matching cost. Comment the results.
 
-left_image = double(rgb2gray(imread('Data/0002_rectified_s.png')));
-right_image = double(rgb2gray(imread('Data/0001_rectified_s.png')));
+left_image = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
+right_image = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
 minimum_disparity = 0;
 maximum_disparity = 16;
 window_size = 9;
