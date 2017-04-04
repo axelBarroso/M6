@@ -258,10 +258,23 @@ minimum_disparity = 0;
 maximum_disparity = 16;
 window_size = 20;
 
+% SSD
 [disparity] = stereo_computation(left_image, right_image, ... 
     minimum_disparity, maximum_disparity, window_size, 'ssd');
-figure;
-imshow(disparity,[]);
+figure; imshow(disparity,[]);
+
+% NCC
+window_size = 20;
+[disparity_ncc] = stereo_computation(double(left_image), double(right_image), ... 
+    minimum_disparity, maximum_disparity, window_size, 'ncc');
+figure; imshow(disparity_ncc,[]);
+
+% Bilateral Weights
+window_size = 40;
+[disparity_bil] = stereo_computation(left_image, right_image, ... 
+    minimum_disparity, maximum_disparity, window_size, 'bilateral_weights');
+
+figure; imshow(disparity_bil,[]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. OPTIONAL: Bilateral weights
 
@@ -279,6 +292,7 @@ right_image = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
 minimum_disparity = 0;
 maximum_disparity = 16;
 window_size = 35;
+
 [disparity_bil] = stereo_computation(left_image, right_image, ... 
     minimum_disparity, maximum_disparity, window_size, 'bilateral_weights');
 
