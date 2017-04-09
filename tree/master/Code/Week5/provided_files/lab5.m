@@ -175,7 +175,7 @@ x2(3,:) = x2(3,:)./x2(3,:);
 x = {x1, x2};
 [Xproj, Pproj] = factorization_method(x);
 
-%{
+
 for i=1:2
     x_proj{i} = euclid(Pproj(3*i-2:3*i, :)*Xproj);
 end
@@ -263,6 +263,22 @@ v3p = vanishing_point(x2(:,1),x2(:,2),x2(:,4),x2(:,3));
 % ToDo: use the vanishing points to compute the matrix Hp that 
 %       upgrades the projective reconstruction to an affine reconstruction
 
+p1 = Pproj(1:3,:);
+p2 = Pproj(4:end,:);
+
+A = [triangulate(euclid(v1), euclid(v1p), p1, p2, [w h])'; ...
+    triangulate(euclid(v2), euclid(v2p), p1, p2, [w h])'; ...
+    triangulate(euclid(v3), euclid(v3p), p1, p2, [w h])'];
+
+[U,D,V] = svd(A);
+H = V(:, end);
+
+for i=1:4
+    H(i) = H(i)/H(4);
+end
+
+Hp = eye(4);
+Hp(end,:) = H';
 
 %% check results
 
@@ -305,6 +321,7 @@ plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
 axis vis3d
 axis equal
 
+%{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Metric reconstruction (synthetic data)
 
