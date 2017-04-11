@@ -321,21 +321,24 @@ plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
 axis vis3d
 axis equal
 
-%{
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Metric reconstruction (synthetic data)
-
 % ToDo: compute the matrix Ha that 
 %       upgrades the projective reconstruction to an affine reconstruction
 % Use the following vanishing points given by three pair of orthogonal lines
 % and assume that the skew factor is zero and that pixels are square
-
 v1 = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
 v2 = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
 v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
+Ha = compute_Ha(Pproj, Hp, v1, v2, v3);
+
+% v1_x2 = vanishing_point(x2(:,2),x2(:,5),x2(:,3),x2(:,6));
+% v2_x2 = vanishing_point(x2(:,1),x2(:,2),x2(:,3),x2(:,4));
+% v3_x2 = vanishing_point(x2(:,1),x2(:,4),x2(:,2),x2(:,3));
+% Ha = compute_Ha(Pproj, Hp, v1_x2, v2_x2, v3_x2);
 
 %% check results
-
 Xa = euclid(Ha*Hp*Xproj);
 figure;
 hold on;
@@ -375,37 +378,29 @@ plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
 axis vis3d
 axis equal
 
+%{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Projective reconstruction (real data)
-
 %% read images
 Irgb{1} = double(imread('Data/0000_s.png'))/255;
 Irgb{2} = double(imread('Data/0001_s.png'))/255;
-
 I{1} = sum(Irgb{1}, 3) / 3; 
 I{2} = sum(Irgb{2}, 3) / 3;
-
 Ncam = length(I);
-
 % ToDo: compute a projective reconstruction using the factorization method
-
 % ToDo: show the data points (image correspondences) and the projected
 % points (of the reconstructed 3D points) in images 1 and 2. Reuse the code
 % in section 'Check projected points' (synthetic experiment).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Affine reconstruction (real data)
-
 % ToDo: compute the matrix Hp that updates the projective reconstruction
 % to an affine one
 %
 % You may use the vanishing points given by function 'detect_vps' that 
 % implements the method presented in Lezama et al. CVPR 2014
 % (http://dev.ipol.im/~jlezama/vanishing_points/)
-
 % This is an example on how to obtain the vanishing points (VPs) from three
 % orthogonal lines in image 1
-
 img_in =  'Data/0000_s.png'; % input image
 folder_out = '.'; % output folder
 manhattan = 1;
@@ -414,13 +409,9 @@ focal_ratio = 1;
 params.PRINT = 1;
 params.PLOT = 1;
 [horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
-
-
 %% Visualize the result
-
 % x1m are the data points in image 1
 % Xm are the reconstructed 3D points (projective reconstruction)
-
 r = interp2(double(Irgb{1}(:,:,1)), x1m(1,:), x1m(2,:));
 g = interp2(double(Irgb{1}(:,:,2)), x1m(1,:), x1m(2,:));
 b = interp2(double(Irgb{1}(:,:,3)), x1m(1,:), x1m(2,:));
@@ -431,24 +422,18 @@ for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
 end;
 axis equal;
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. Metric reconstruction (real data)
-
 % ToDo: compute the matrix Ha that updates the affine reconstruction
 % to a metric one and visualize the result in 3D as in the previous section
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL: Projective reconstruction from two views
-
 % ToDo: compute a projective reconstruction from the same two views 
 % by computing two possible projection matrices from the fundamental matrix
 % and one of the epipoles.
 % Then update the reconstruction to affine and metric as before (reuse the code).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 8. OPTIONAL: Projective reconstruction from more than two views
-
 % ToDo: extend the function that computes the projective reconstruction 
 % with the factorization method to the case of three views. You may use 
 % the additional image '0002_s.png'
@@ -458,11 +443,9 @@ axis equal;
 % incorporate new 3D points by triangulation, incorporate new views
 % by resectioning, better visualization of the result with another
 % software, ...)
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 9. OPTIONAL: Any other improvement you may icorporate 
 %
 %  (add a 4th view, incorporate new 3D points by triangulation, 
 %   apply any kind of processing on the point cloud, ...)
-
 %}
