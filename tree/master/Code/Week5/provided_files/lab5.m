@@ -328,15 +328,16 @@ axis equal
 %       upgrades the projective reconstruction to an affine reconstruction
 % Use the following vanishing points given by three pair of orthogonal lines
 % and assume that the skew factor is zero and that pixels are square
-v1 = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
-v2 = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
-v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
-Ha = compute_Ha(Pproj, Hp, v1, v2, v3);
 
-% v1_x2 = vanishing_point(x2(:,2),x2(:,5),x2(:,3),x2(:,6));
-% v2_x2 = vanishing_point(x2(:,1),x2(:,2),x2(:,3),x2(:,4));
-% v3_x2 = vanishing_point(x2(:,1),x2(:,4),x2(:,2),x2(:,3));
-% Ha = compute_Ha(Pproj, Hp, v1_x2, v2_x2, v3_x2);
+% v1 = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
+% v2 = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
+% v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
+% Ha = compute_Ha(Pproj, Hp, v1, v2, v3);
+
+v1_x2 = vanishing_point(x2(:,2),x2(:,5),x2(:,3),x2(:,6));
+v2_x2 = vanishing_point(x2(:,1),x2(:,2),x2(:,3),x2(:,4));
+v3_x2 = vanishing_point(x2(:,1),x2(:,4),x2(:,2),x2(:,3));
+Ha = compute_Ha(Pproj, Hp, v1_x2, v2_x2, v3_x2);
 
 %% check results
 Xa = euclid(Ha*Hp*Xproj);
@@ -378,9 +379,10 @@ plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
 axis vis3d
 axis equal
 
-%{
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Projective reconstruction (real data)
+clear all, clc,
 %% read images
 Irgb{1} = double(imread('Data/0000_s.png'))/255;
 Irgb{2} = double(imread('Data/0001_s.png'))/255;
@@ -391,6 +393,58 @@ Ncam = length(I);
 % ToDo: show the data points (image correspondences) and the projected
 % points (of the reconstructed 3D points) in images 1 and 2. Reuse the code
 % in section 'Check projected points' (synthetic experiment).
+
+for i = 1:2
+    [Point{i}, Descriptor{i}] = sift(I{i}, 'Threshold', 0.005);
+    Point{i} = Point{i}(1:2,:);
+end
+
+Match = siftmatch(Descriptor{1}, Descriptor{2});
+x1 = Point{1}(:, Match(1, :));
+x2 = Point{2}(:, Match(2, :));
+
+[FundamentalM, InlierPoints] = ransac_fundamental_matrix(homog(x1), homog(x2), 2);
+
+InlierMatch = Match(:, InlierPoints);
+figure;
+plotmatches(I{1}, I{2}, Point{1}, Point{2}, InlierMatch, 'Stacking', 'v');
+
+x1 = Point{1}(:, InlierMatch(1, :));
+x2 = Point{2}(:, InlierMatch(2, :));
+x = {homog(x1), homog(x2)};
+
+[Xproj, Pproj] = factorization_method(x);
+
+
+for i=1:2
+    xproj{i} = euclid(Pproj(3*i-2:3*i, :)*Xproj);
+end
+
+
+figure;
+hold on
+plot(xproj{1}(1,:),xproj{1}(2,:),'r*');
+plot(xproj{1}(1,:),xproj{1}(2,:),'bo');
+axis equal
+
+
+figure;
+hold on
+plot(xproj{2}(1,:),xproj{2}(2,:),'r*');
+plot(xproj{2}(1,:),xproj{2}(2,:),'bo');
+
+
+%3D visualisation
+X(1,:) = Xproj(1,:)./Xproj(4,:);
+X(2,:) = Xproj(2,:)./Xproj(4,:);
+X(3,:) = Xproj(3,:)./Xproj(4,:);
+figure; hold on;
+for i = 1:length(X)
+    scatter3(X(1,i), X(2,i), X(3,i), 15, [0.2 0.9 0.4], 'filled');
+end;
+axis([-200 200 -200 200 -200 200]);
+axis vis3d;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Affine reconstruction (real data)
 % ToDo: compute the matrix Hp that updates the projective reconstruction
@@ -448,4 +502,3 @@ axis equal;
 %
 %  (add a 4th view, incorporate new 3D points by triangulation, 
 %   apply any kind of processing on the point cloud, ...)
-%}
